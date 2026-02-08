@@ -60,23 +60,6 @@ impl ProgramCounter {
         }
     }
 
-    pub fn tick(&mut self) {
-        unsafe {
-            vpc_eval(self.ptr);
-            if let Some(t) = self.tfp { vpc_trace_dump(t, self.time); }
-            // 2. Falling edge
-            vpc_set_clk(self.ptr, 0);
-            vpc_eval(self.ptr);
-            self.time += 5; // 5ns step
-            if let Some(t) = self.tfp { vpc_trace_dump(t, self.time); }
-
-            // 1. Rising edge
-            vpc_set_clk(self.ptr, 1);
-            vpc_eval(self.ptr);
-            self.time += 5; // 5ns step
-        }
-    }
-
     pub fn eval(&mut self) {
         unsafe {
             vpc_eval(self.ptr);

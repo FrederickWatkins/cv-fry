@@ -5,20 +5,33 @@ use std::process::Command;
 
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-    
-    // 1. Run Verilator
-    let status = Command::new("verilator")
-        .args([
-            "-Wall", "--cc", "--trace",
-            "-Isrc",
-            "--prefix", "Vpc",
-            "-Mdir", out_dir.to_str().unwrap(),
-            "src/processor/core/ifu/pc.sv",
-        ])
-        .status()
-        .expect("Failed to run Verilator");
 
-    if !status.success() { panic!("Verilator execution failed"); }
+    let targets = [
+        ("Vpc", "src/processor/core/ifu/pc.sv", "test/pc/pc.cpp"),
+        ("Valu", "src/processor/core/ieu/alu.sv", "test/alu/alu.cpp"),
+    ];
+
+    for (prefix, path, _) in targets {
+        // 1. Run Verilator
+        let status = Command::new("verilator")
+            .args([
+                "-Wall",
+                "--cc",
+                "--trace",
+                "-Isrc",
+                "--prefix",
+                prefix,
+                "-Mdir",
+                out_dir.to_str().unwrap(),
+                path,
+            ])
+            .status()
+            .expect("Failed to run Verilator");
+
+        if !status.success() {
+            panic!("Verilator execution failed");
+        }
+    }
 
     // 2. Automatically find ALL generated .cpp files
     // This solves the "undefined reference to Vpc___024root" error
@@ -46,10 +59,11 @@ fn main() {
     c_builder.file("/usr/share/verilator/include/verilated_vcd_c.cpp");
     c_builder.file("/usr/share/verilator/include/verilated_threads.cpp"); // Add this for ThreadPool error
 
-    // 4. Add your bridge/shim if you wrote one
-    c_builder.file("test/pc/pc.cpp");
+    for (_, _, shim) in targets {
+        c_builder.file(shim);
+    }
 
-    c_builder.compile("pc_hw");
+    c_builder.compile("verilated_cpp");
 
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=test/pc/pc.cpp");
