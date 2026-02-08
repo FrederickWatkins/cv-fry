@@ -1,4 +1,4 @@
-use cv_fry::utils::dut::DUT;
+use crate::utils::dut::DUT;
 
 // Raw FFI definitions
 unsafe extern "C" {

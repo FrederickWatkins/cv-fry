@@ -30,7 +30,7 @@ module alu #(
 
     localparam shamt_len = XLEN == 32 ? 5 : 6;
 
-    always @(*) begin
+    always_comb begin
         case({funct7, funct3})
         {BASEOP, ADD}: result = operand_1 + operand_2;
         {BASEOP, SL}: result = operand_1 << operand_2[shamt_len-1:0];

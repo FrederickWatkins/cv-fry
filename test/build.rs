@@ -7,14 +7,23 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     let targets = [
-        ("Vpc", "src/processor/core/ifu/pc.sv", "test/pc/pc.cpp"),
-        ("Valu", "src/processor/core/ieu/alu.sv", "test/alu/alu.cpp"),
+        ("Vpc", "src/processor/core/ifu/pc.sv", "test/pc/pc.cpp", vec![]),
+        (
+            "Valu",
+            "src/processor/core/ieu/alu.sv",
+            "test/alu/alu.cpp",
+            vec![],
+        ),
+        (
+            "Vifu",
+            "test/ifu/ifu_shim.sv",
+            "test/ifu/ifu.cpp",
+            vec!["src/processor/core/ifu", "src/bus"],
+        ),
     ];
 
-    for (prefix, path, _) in targets {
-        // 1. Run Verilator
-        let status = Command::new("verilator")
-            .args([
+    for (prefix, path, _, deps) in targets.clone() {
+        let mut args = vec![
                 "-Wall",
                 "--cc",
                 "--trace",
@@ -24,7 +33,14 @@ fn main() {
                 "-Mdir",
                 out_dir.to_str().unwrap(),
                 path,
-            ])
+            ];
+        for dep in deps {
+            args.push("-y");
+            args.push(dep);
+        }
+        // 1. Run Verilator
+        let status = Command::new("verilator")
+            .args(args)
             .status()
             .expect("Failed to run Verilator");
 
@@ -59,7 +75,7 @@ fn main() {
     c_builder.file("/usr/share/verilator/include/verilated_vcd_c.cpp");
     c_builder.file("/usr/share/verilator/include/verilated_threads.cpp"); // Add this for ThreadPool error
 
-    for (_, _, shim) in targets {
+    for (_, _, shim, _) in targets {
         c_builder.file(shim);
     }
 

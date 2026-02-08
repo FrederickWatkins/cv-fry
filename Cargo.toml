@@ -10,12 +10,15 @@ path = "test/lib.rs"
 [build-dependencies]
 cc = "1.2.55"
 
-[[test]]
-name = "pc"
-path = "test/pc/pc.rs"
-[[test]]
-name = "alu"
-path = "test/alu/alu.rs"
+#[[test]]
+#name = "pc"
+#path = "test/pc/pc.rs"
+#[[test]]
+#name = "alu"
+#path = "test/alu/alu.rs"
+#[[test]]
+#name = "ifu"
+#path = "test/ifu/ifu.rs"
 
 [dev-dependencies]
 proptest = "1.10.0"
