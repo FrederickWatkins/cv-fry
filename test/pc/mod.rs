@@ -14,19 +14,15 @@ unsafe extern "C" {
     fn vpc_get_curr_pc(dut: *mut std::ffi::c_void) -> u32;
     fn vpc_get_inc_pc(dut: *mut std::ffi::c_void) -> u32;
     fn vpc_get_next_pc(dut: *mut std::ffi::c_void) -> u32;
-    fn vpc_trace_init(dut: *mut std::ffi::c_void, filename: *const std::ffi::c_char) -> *mut std::ffi::c_void;
-    fn vpc_trace_dump(tfp: *mut std::ffi::c_void, time: u64);
-    fn vpc_trace_close(tfp: *mut std::ffi::c_void);
 }
 pub struct ProgramCounter {
     ptr: *mut std::ffi::c_void,
-    tfp: Option<*mut std::ffi::c_void>,
     time: u64,
 }
 
 impl ProgramCounter {
     pub fn new() -> Self {
-        Self { ptr: unsafe { vpc_init() }, tfp: None, time: 0 }
+        Self { ptr: unsafe { vpc_init() }, time: 0 }
     }
 
     pub fn set_stall(&mut self, val: u8) {
@@ -53,13 +49,6 @@ impl ProgramCounter {
         }
     }
 
-    pub fn enable_tracing(&mut self, filename: &str) {
-        let c_str = std::ffi::CString::new(filename).unwrap();
-        unsafe {
-            self.tfp = Some(vpc_trace_init(self.ptr, c_str.as_ptr()));
-        }
-    }
-
     pub fn eval(&mut self) {
         unsafe {
             vpc_eval(self.ptr);
@@ -81,8 +70,7 @@ impl ProgramCounter {
 
 impl Drop for ProgramCounter {
     fn drop(&mut self) {
-        if let Some(t) = self.tfp { unsafe {vpc_trace_close(t); }}
-        // unsafe { vpc_destroy(self.ptr) }; Causes SIGSEV so let it leak baby
+        unsafe { vpc_destroy(self.ptr) };
     }
 }
 
@@ -99,10 +87,6 @@ impl DUT for ProgramCounter {
         self.time += 5;
     }
 
-    fn dump_trace(&self) {
-        unsafe{if let Some(t) = self.tfp { vpc_trace_dump(t, self.time); }}
-    }
-    
     fn reset(&mut self) {
         unsafe {
             vpc_set_reset_n(self.ptr, 0); // Active low reset?
@@ -120,7 +104,6 @@ mod tests {
     #[test]
     fn test_increments() {
         let mut pc = ProgramCounter::new();
-        pc.enable_tracing(concat!(env!("CARGO_MANIFEST_DIR"), "/target/pc_test_increments.vcd")); // This creates the file
         pc.reset();
         assert_eq!(pc.get_curr_pc(), 0);
         pc.tick();
@@ -144,7 +127,6 @@ mod tests {
     #[test]
     fn test_jump() {
         let mut pc = ProgramCounter::new();
-        pc.enable_tracing(concat!(env!("CARGO_MANIFEST_DIR"), "/target/pc_test_jump.vcd")); // This creates the file
         pc.reset();
         pc.tick();
         pc.tick();
@@ -165,7 +147,6 @@ mod tests {
     #[test]
     fn test_stall() {
         let mut pc = ProgramCounter::new();
-        pc.enable_tracing(concat!(env!("CARGO_MANIFEST_DIR"), "/target/pc_test_stall.vcd")); // This creates the file
         pc.reset();
         pc.tick();
         pc.tick();
@@ -191,7 +172,6 @@ mod tests {
     #[test]
     fn test_stall_jump() {
         let mut pc = ProgramCounter::new();
-        pc.enable_tracing(concat!(env!("CARGO_MANIFEST_DIR"), "/target/pc_test_stall_jump.vcd")); // This creates the file
         pc.reset();
         pc.tick();
         pc.tick();

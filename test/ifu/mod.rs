@@ -7,7 +7,6 @@ unsafe extern "C" {
     fn vifu_eval(dut: *mut std::ffi::c_void);
     fn vifu_set_clk(dut: *mut std::ffi::c_void, val: u8);
     fn vifu_set_stall(dut: *mut std::ffi::c_void, val: u8);
-    fn vifu_set_compressed(dut: *mut std::ffi::c_void, val: u8);
     fn vifu_set_jump(dut: *mut std::ffi::c_void, val: u8);
     fn vifu_set_jack(dut: *mut std::ffi::c_void, val: u8);
     fn vifu_set_je(dut: *mut std::ffi::c_void, val: u8);
@@ -21,19 +20,15 @@ unsafe extern "C" {
     fn vifu_get_inc_pc(dut: *mut std::ffi::c_void) -> u32;
     fn vifu_get_addr(dut: *mut std::ffi::c_void) -> u32;
     fn vifu_get_instr_out(dut: *mut std::ffi::c_void) -> u32;
-    fn vifu_trace_init(dut: *mut std::ffi::c_void, filename: *const std::ffi::c_char) -> *mut std::ffi::c_void;
-    fn vifu_trace_dump(tfp: *mut std::ffi::c_void, time: u64);
-    fn vifu_trace_close(tfp: *mut std::ffi::c_void);
 }
-pub struct ProgramCounter {
+pub struct Ifu {
     ptr: *mut std::ffi::c_void,
-    tfp: Option<*mut std::ffi::c_void>,
     time: u64,
 }
 
-impl ProgramCounter {
+impl Ifu {
     pub fn new() -> Self {
-        Self { ptr: unsafe { vifu_init() }, tfp: None, time: 0 }
+        Self { ptr: unsafe { vifu_init() }, time: 0 }
     }
 
     pub fn set_stall(&mut self, val: u8) {
@@ -42,9 +37,21 @@ impl ProgramCounter {
         }
     }
 
-    pub fn set_compressed(&mut self, val: u8) {
+    pub fn set_jump(&mut self, val: u8) {
         unsafe {
-            vifu_set_compressed(self.ptr, val);
+            vifu_set_jump(self.ptr, val);
+        }
+    }
+    
+    pub fn set_jack(&mut self, val: u8) {
+        unsafe {
+            vifu_set_jack(self.ptr, val);
+        }
+    }
+
+    pub fn set_ack(&mut self, val: u8) {
+        unsafe {
+            vifu_set_ack(self.ptr, val);
         }
     }
 
@@ -60,10 +67,9 @@ impl ProgramCounter {
         }
     }
 
-    pub fn enable_tracing(&mut self, filename: &str) {
-        let c_str = std::ffi::CString::new(filename).unwrap();
+    pub fn set_instr(&mut self, val: u32) {
         unsafe {
-            self.tfp = Some(vifu_trace_init(self.ptr, c_str.as_ptr()));
+            vifu_set_instr(self.ptr, val);
         }
     }
 
@@ -73,6 +79,14 @@ impl ProgramCounter {
         }
     }
 
+    pub fn get_re(&self) -> u8 {
+        unsafe { vifu_get_re(self.ptr) }
+    }
+
+    pub fn get_sel(&self) -> u8 {
+        unsafe { vifu_get_sel(self.ptr) }
+    }
+
     pub fn get_curr_pc(&self) -> u32 {
         unsafe { vifu_get_curr_pc(self.ptr) }
     }
@@ -80,16 +94,23 @@ impl ProgramCounter {
     pub fn get_inc_pc(&self) -> u32 {
         unsafe { vifu_get_inc_pc(self.ptr) }
     }
-}
 
-impl Drop for ProgramCounter {
-    fn drop(&mut self) {
-        if let Some(t) = self.tfp { unsafe {vifu_trace_close(t); }}
-        // unsafe { vifu_destroy(self.ptr) }; Causes SIGSEV so let it leak baby
+    pub fn get_addr(&self) -> u32 {
+        unsafe { vifu_get_addr(self.ptr) }
+    }
+
+    pub fn get_instr_out(&self) -> u32 {
+        unsafe { vifu_get_instr_out(self.ptr) }
     }
 }
 
-impl DUT for ProgramCounter {
+impl Drop for Ifu {
+    fn drop(&mut self) {
+        unsafe { vifu_destroy(self.ptr) };
+    }
+}
+
+impl DUT for Ifu {
     fn set_clk(&mut self, val: u8) {
         unsafe {vifu_set_clk(self.ptr, val);}
     }
@@ -101,13 +122,11 @@ impl DUT for ProgramCounter {
     fn timestep(&mut self) {
         self.time += 5;
     }
-
-    fn dump_trace(&self) {
-        unsafe{if let Some(t) = self.tfp { vifu_trace_dump(t, self.time); }}
-    }
     
     fn reset(&mut self) {
         unsafe {
+            self.set_clk(0);
+            self.eval();
             vifu_set_reset_n(self.ptr, 0); // Active low reset?
             self.tick();
             vifu_set_reset_n(self.ptr, 1);
@@ -119,9 +138,53 @@ impl DUT for ProgramCounter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils::c2c_r::C2cR;
 
     #[test]
     fn test_increments() {
-        assert!(true);
+        let mut ifu = Ifu::new();
+        let memory: [u8; 64] = [
+            0x00, 0x00, 0x00, 0x13,
+            0x01, 0x00, 0x00, 0x13,
+            0x02, 0x00, 0x00, 0x13,
+            0x03, 0x00, 0x00, 0x13,
+            0x04, 0x00, 0x00, 0x13,
+            0x05, 0x00, 0x00, 0x13,
+            0x06, 0x00, 0x00, 0x13,
+            0x07, 0x00, 0x00, 0x13,
+            0x08, 0x00, 0x00, 0x13,
+            0x09, 0x00, 0x00, 0x13,
+            0x0A, 0x00, 0x00, 0x13,
+            0x0B, 0x00, 0x00, 0x13,
+            0x0C, 0x00, 0x00, 0x13,
+            0x0D, 0x00, 0x00, 0x13,
+            0x0E, 0x00, 0x00, 0x13,
+            0x0F, 0x00, 0x00, 0x13,
+        ];
+        let mut ack = false;
+        let mut instr = 0;
+        let mut instr_bus = C2cR::new(3);
+        ifu.reset();
+        assert_eq!(ifu.get_curr_pc(), 0);
+        for i in 0..40 {
+            ifu.set_ack(ack as u8);
+            ifu.set_instr(instr);
+            ifu.set_clk(0);
+            ifu.eval();
+            ifu.timestep();
+            println!("{:x} {} {} {ack}", ifu.get_instr_out(), ifu.get_addr(), i);
+            if !ack {
+                assert_eq!(ifu.get_instr_out(), 0x00000004)
+            }
+            if ack {
+                assert_eq!(ifu.get_instr_out()>>22, (i - 1) / 4);
+            }
+            (ack, instr) = instr_bus.respond(&memory, ifu.get_re()==1, ifu.get_sel(), ifu.get_addr());
+            assert_eq!(ifu.get_addr(), (i / 4) * 4);
+            ifu.set_clk(1);
+            ifu.eval();
+            ifu.timestep();
+        }
+        //assert!(false);
     }
 }

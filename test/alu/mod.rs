@@ -10,19 +10,15 @@ unsafe extern "C" {
     fn valu_set_operand_1(dut: *mut std::ffi::c_void, val: u32);
     fn valu_set_operand_2(dut: *mut std::ffi::c_void, val: u32);
     fn valu_get_result(dut: *mut std::ffi::c_void) -> u32;
-    fn valu_trace_init(dut: *mut std::ffi::c_void, filename: *const std::ffi::c_char) -> *mut std::ffi::c_void;
-    fn valu_trace_dump(tfp: *mut std::ffi::c_void, time: u64);
-    fn valu_trace_close(tfp: *mut std::ffi::c_void);
 }
 pub struct Alu {
     ptr: *mut std::ffi::c_void,
-    tfp: Option<*mut std::ffi::c_void>,
     time: u64,
 }
 
 impl Alu {
     pub fn new() -> Self {
-        Self { ptr: unsafe { valu_init() }, tfp: None, time: 0 }
+        Self { ptr: unsafe { valu_init() }, time: 0 }
     }
 
     pub fn set_funct3(&mut self, val: u8) {
@@ -49,13 +45,6 @@ impl Alu {
         }
     }
 
-    pub fn enable_tracing(&mut self, filename: &str) {
-        let c_str = std::ffi::CString::new(filename).unwrap();
-        unsafe {
-            self.tfp = Some(valu_trace_init(self.ptr, c_str.as_ptr()));
-        }
-    }
-
     pub fn eval(&mut self) {
         unsafe {
             valu_eval(self.ptr);
@@ -69,8 +58,7 @@ impl Alu {
 
 impl Drop for Alu {
     fn drop(&mut self) {
-        if let Some(t) = self.tfp { unsafe {valu_trace_close(t); }}
-        // unsafe { valu_destroy(self.ptr) }; Causes SIGSEV so let it leak baby
+        unsafe { valu_destroy(self.ptr) };
     }
 }
 
@@ -85,10 +73,6 @@ impl DUT for Alu {
 
     fn timestep(&mut self) {
         self.time += 5;
-    }
-
-    fn dump_trace(&self) {
-        unsafe{if let Some(t) = self.tfp { valu_trace_dump(t, self.time); }}
     }
     
     fn reset(&mut self) {

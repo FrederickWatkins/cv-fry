@@ -10,7 +10,7 @@ fn main() {
         ("Vpc", "src/processor/core/ifu/pc.sv", "test/pc/pc.cpp", vec![]),
         (
             "Valu",
-            "src/processor/core/ieu/alu.sv",
+            "src/processor/core/alu/alu.sv",
             "test/alu/alu.cpp",
             vec![],
         ),
