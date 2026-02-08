@@ -1,0 +1,18 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Sun Feb  8 05:08:52 2026
+[*]
+[dumpfile] "/home/freddie/Developement/cv-fry/target/pc.vcd"
+[dumpfile_mtime] "Sun Feb  8 05:08:19 2026"
+[dumpfile_size] 1504
+[savefile] "/home/freddie/Developement/cv-fry/test/pc.sav"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-4.601765 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 268
+[signals_width] 78
+[sst_expanded] 1
+[sst_vpaned_height] 157
+[pattern_trace] 1
+[pattern_trace] 0
