@@ -30,7 +30,13 @@ fn main() {
             "Vjbu",
             "src/processor/core/ieu/jbu.sv",
             "test/jbu/jbu.cpp",
-            vec![]
+            vec![],
+        ),
+        (
+            "Vdecoder",
+            "src/processor/core/decoder/decoder.sv",
+            "test/decoder/decoder.cpp",
+            vec!["src/processor/core/decoder/"],
         ),
     ];
 

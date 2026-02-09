@@ -12,7 +12,7 @@ module core #(
 );
     logic stall_D, stall_M; // Stall signals decode and main memory
     // Decode stage signals
-    logic jump_D;
+    logic jb_D;
     logic [4:0] rs1_addr_D, rs2_addr_D;
     logic [31:2] instr_D;
     logic [XLEN-1:0] curr_pc_D, inc_pc_D;
@@ -26,7 +26,7 @@ module core #(
     logic [2:0] funct3_M;
     logic [XLEN-1:0] rs2_data_M, ieu_result_M, inc_pc_M;
     // Writeback stage signals (currently in same stage as memory)
-    logic wb_ieu_W, wb_lsu_W;
+    logic wb_ieu_W, wb_lsu_W, wb_pc_W;
     logic [4:0] rd_addr_W;
     logic [XLEN-1:0] lsu_data_W, ieu_result_W, inc_pc_W;
     // Return signals from ieu to ifu
@@ -62,7 +62,7 @@ module core #(
         .instr_bus,
 
         .stall(stall_D | stall_M),
-        .jump(jump_D),
+        .jump(jb_D),
         .jack(jack_E),
         .je(je_E),
         .ja(ja_E),
@@ -82,7 +82,7 @@ module core #(
         .stall_M,
         // Decode stage outputs (no reg)
         .stall_D,
-        .jump_D,
+        .jb_D,
         .rs1_addr_D, .rs2_addr_D,
         // Execute stage outputs (one reg)
         .jump_E, .branch_E, .op1_pc_E, .op2_imm_E,
@@ -91,10 +91,9 @@ module core #(
         // Memory stage outputs (two reg)
         .mm_re_M, .mm_we_M,
         .funct3_M,
-        .rs2_data_M, .ieu_result_M,
         // Writeback stage outputs (three reg)
-        .wb_ieu_W, .wb_lsu_W,
-        .lsu_data_W, .ieu_result_W, .rd_addr_W
+        .wb_ieu_W, .wb_lsu_W, .wb_pc_W,
+        .rd_addr_W
     );
 
     rf #(
