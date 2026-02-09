@@ -162,16 +162,11 @@ mod tests {
             0x0F, 0x00, 0x00, 0x13,
         ];
         let mut ack = false;
-        let mut instr = 0;
+        let mut instr;
         let mut instr_bus = C2cR::new(3);
         ifu.reset();
         assert_eq!(ifu.get_curr_pc(), 0);
         for i in 0..40 {
-            ifu.set_ack(ack as u8);
-            ifu.set_instr(instr);
-            ifu.set_clk(0);
-            ifu.eval();
-            ifu.timestep();
             println!("{:x} {} {} {ack}", ifu.get_instr_out(), ifu.get_addr(), i);
             if !ack {
                 assert_eq!(ifu.get_instr_out(), 0x00000004)
@@ -180,11 +175,44 @@ mod tests {
                 assert_eq!(ifu.get_instr_out()>>22, (i - 1) / 4);
             }
             (ack, instr) = instr_bus.respond(&memory, ifu.get_re()==1, ifu.get_sel(), ifu.get_addr());
+            ifu.set_ack(ack as u8);
+            ifu.set_instr(instr);
             assert_eq!(ifu.get_addr(), (i / 4) * 4);
-            ifu.set_clk(1);
-            ifu.eval();
-            ifu.timestep();
+            ifu.tick();
         }
-        //assert!(false);
+    }
+
+    #[test]
+    fn nackjack() {
+        let mut ifu = Ifu::new();
+        ifu.reset();
+        assert_eq!(ifu.get_curr_pc(), 0);
+        ifu.set_stall(0);
+        ifu.set_ack(0);
+        ifu.set_instr(0x13);
+        ifu.eval();
+        assert_eq!(ifu.get_addr(), 0);
+        ifu.set_jump(1);
+        ifu.tick();
+        ifu.set_jump(0);
+        ifu.tick();
+        assert_eq!(ifu.get_addr(), 0);
+        ifu.set_ack(1);
+        ifu.tick();
+        assert_eq!(ifu.get_addr(), 4);
+        ifu.set_instr(0xDEADBEEF);
+        ifu.set_jump(1);
+        ifu.eval();
+        assert_eq!(ifu.get_instr_out(), 0xDEADBEEF >> 2);
+        ifu.tick();
+        assert_eq!(ifu.get_instr_out(), 0x4);
+        ifu.set_jump(0);
+        ifu.tick();
+        ifu.tick();
+        ifu.tick();
+        assert_eq!(ifu.get_addr(), 4);
+        ifu.set_jack(1);
+        ifu.tick();
+        assert_eq!(ifu.get_addr(), 8);
     }
 }

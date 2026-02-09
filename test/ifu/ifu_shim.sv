@@ -26,9 +26,12 @@ module ifu_shim #(
 
     assign instr_bus.ack = ack;
     assign instr_bus.data = instr;
-    assign re = instr_bus.re;
-    assign sel = instr_bus.sel;
-    assign addr = instr_bus.addr;
+
+    always_ff @(posedge clk) begin
+        re <= instr_bus.re;
+        sel <= instr_bus.sel;
+        addr <= instr_bus.addr;
+    end
 
     ifu #(
         .XLEN(XLEN)

@@ -43,13 +43,14 @@ module ifu #(
             else begin
                 instr_out = 'h4; // NOP
             end
-            if(jump & !stall) begin
+            if(jump & !pc_stall) begin
                 pc_stall = 1;
                 next_state = WAIT_JUMP;
             end
         end
         WAIT_JUMP: begin
             instr_out = 'h4;
+            pc_stall = 1;
             if(jack) begin
                 pc_stall = 0;
                 next_state = RUNNING;
