@@ -50,7 +50,7 @@ module decoder #(
     logic wb_ieu_M, wb_lsu_M, wb_pc_M;
     logic [4:0] rd_addr_M;
 
-    assign opcode = instr[6:2]
+    assign opcode = instr[6:2];
 
     always_comb begin
         jb_D = 0;
@@ -77,12 +77,14 @@ module decoder #(
             mm_re_D = 1;
             wb_lsu_D = 1;
             alu_funct3_D = 'b000; // Use alu to add addresses
+            funct7_D = 0;
             imm_D = {{(XLEN-11){instr[31]}}, instr[30:20]};
         end
         STORE: begin
             op2_imm_D = 1;
             mm_we_D = 1;
             alu_funct3_D = 'b000; // Use alu to add addresses
+            funct7_D = 0;
             imm_D = {{(XLEN-11){instr[31]}}, instr[30:25], instr[11:7]};
             rd_addr_D = 0;
         end
@@ -92,6 +94,7 @@ module decoder #(
             op1_pc_D = 1;
             op2_imm_D = 1;
             alu_funct3_D = 'b000; // Use alu to add addresses
+            funct7_D = 0;
             imm_D = {{(XLEN-12){instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
             rd_addr_D = 0;
         end
@@ -102,6 +105,7 @@ module decoder #(
             op2_imm_D = 1;
             wb_pc_D = 1;
             alu_funct3_D = 'b000; // Use alu to add addresses
+            funct7_D = 0;
             imm_D = {{(XLEN-11){instr[31]}}, instr[30:20]};
         end
         MISC_MEM: ; // Do nothing, no cache and in-order
@@ -114,12 +118,14 @@ module decoder #(
             op2_imm_D = 1;
             wb_pc_D = 1;
             alu_funct3_D = 'b000; // Use alu to add addresses
+            funct7_D = 0;
             imm_D = {{(XLEN-20){instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
         end
         OP_IMM: begin
             rs2_addr_D = 0;
             op2_imm_D = 1;
             wb_ieu_D = 1;
+            funct7_D = 0;
             imm_D = {{(XLEN-11){instr[31]}}, instr[30:20]};
             // Special shift case
             if(funct3_D == 'b101 | funct3_D == 'b001) begin
@@ -138,6 +144,7 @@ module decoder #(
             op2_imm_D = 1;
             wb_ieu_D = 1;
             alu_funct3_D = 'b000; // Use alu to add immediate
+            funct7_D = 0;
             imm_D = {{(XLEN-31){instr[31]}}, instr[30:12], {12{1'b0}}};
         end
         LUI: begin
@@ -146,6 +153,7 @@ module decoder #(
             op2_imm_D = 1;
             wb_ieu_D = 1;
             alu_funct3_D = 'b000; // Use alu to add immediate to zero
+            funct7_D = 0;
             imm_D = {{(XLEN-31){instr[31]}}, instr[30:12], {12{1'b0}}};
         end
         default: ;

@@ -38,6 +38,12 @@ fn main() {
             "test/decoder/decoder.cpp",
             vec!["src/processor/core/decoder/"],
         ),
+        (
+            "Vcore",
+            "test/core/core_shim.sv",
+            "test/core/core.cpp",
+            vec!["src/bus", "src/processor/core", "src/processor/core/decoder", "src/processor/core/ieu", "src/processor/core/ifu", "src/processor/core/lsu", "src/processor/core/rf"],
+        ),
     ];
 
     for (prefix, path, _, deps) in targets.clone() {

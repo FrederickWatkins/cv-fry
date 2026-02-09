@@ -30,7 +30,8 @@ module core #(
     logic [4:0] rd_addr_W;
     logic [XLEN-1:0] lsu_data_W, ieu_result_W, inc_pc_W;
     // Return signals from ieu to ifu
-    logic jack_E, je_E, ja_E;
+    logic jack_E, je_E;
+    logic [XLEN-1:0] ja_E;
 
     always_ff @(posedge clk or negedge reset_n) begin
         if(!(stall_D | stall_M)) begin
@@ -107,7 +108,10 @@ module core #(
         .rd_addr(rd_addr_W),
         .lsu_data(lsu_data_W),
         .ieu_result(ieu_result_W),
-        .inc_pc(inc_pc_W)
+        .inc_pc(inc_pc_W),
+        .wb_ieu(wb_ieu_W),
+        .wb_lsu(wb_lsu_W),
+        .wb_pc(wb_pc_W),
 
         .rs1_data(rs1_data_E),
         .rs2_data(rs2_data_E)
