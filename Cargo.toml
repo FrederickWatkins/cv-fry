@@ -2,23 +2,17 @@
 name = "cv-fry"
 version = "0.1.0"
 edition = "2024"
-build = "test/build.rs"
+build = "build.rs"
 
 [lib]
 path = "test/lib.rs"
 
+[[bin]]
+name = "simulate-core"
+path = "sim/core.rs"
+
 [build-dependencies]
 cc = "1.2.55"
-
-#[[test]]
-#name = "pc"
-#path = "test/pc/pc.rs"
-#[[test]]
-#name = "alu"
-#path = "test/alu/alu.rs"
-#[[test]]
-#name = "ifu"
-#path = "test/ifu/ifu.rs"
 
 [dev-dependencies]
 proptest = "1.10.0"
