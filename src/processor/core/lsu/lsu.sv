@@ -34,6 +34,8 @@ module lsu #(
     state curr_state;
     state next_state;
 
+    logic [XLEN-1:0] output_data;
+
     assign data_bus_r.addr = ieu_result;
     assign data_bus_w.addr = ieu_result;
     assign data_bus_w.data = rs2_data;
@@ -50,6 +52,10 @@ module lsu #(
             data_bus_w.sel = 'b0011;
         end
         WORD: begin
+            data_bus_r.sel = 'b1111;
+            data_bus_w.sel = 'b1111;
+        end
+        default: begin
             data_bus_r.sel = 'b1111;
             data_bus_w.sel = 'b1111;
         end
@@ -98,9 +104,7 @@ module lsu #(
             if(data_bus_w.ack) begin
                 next_state = IDLE;
                 stall = 0;
-                data_bus.WE = 0;
-                data_bus.STB = 0;
-                data_bus.CYC = 0;
+                data_bus_w.we = 0;
             end
         end
         default: ;

@@ -22,5 +22,5 @@ interface c2c_w #(
         input data,
 
         output ack
-    )
+    );
 endinterface

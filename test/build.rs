@@ -20,6 +20,18 @@ fn main() {
             "test/ifu/ifu.cpp",
             vec!["src/processor/core/ifu", "src/bus"],
         ),
+        (
+            "Vlsu",
+            "test/lsu/lsu_shim.sv",
+            "test/lsu/lsu.cpp",
+            vec!["src/processor/core/lsu", "src/bus"],
+        ),
+        (
+            "Vjbu",
+            "src/processor/core/ieu/jbu.sv",
+            "test/jbu/jbu.cpp",
+            vec![]
+        ),
     ];
 
     for (prefix, path, _, deps) in targets.clone() {
