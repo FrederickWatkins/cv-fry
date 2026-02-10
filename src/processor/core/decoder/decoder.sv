@@ -160,7 +160,35 @@ module decoder #(
         endcase
     end
 
-    always_ff @(posedge clk or negedge reset_n) begin
+    always_ff @(posedge clk) begin
+        if(!reset_n) begin
+            jump_E <= 0;
+            branch_E <= 0;
+            op1_pc_E <= 0;
+            op2_imm_E <= 0;
+            alu_funct3_E <= 0;
+            funct3_E <= 0;
+            funct7_E <= 0;
+            imm_E <= 0;
+            mm_re_E <= 0;
+            mm_we_E <= 0;
+            wb_ieu_E <= 0;
+            wb_lsu_E <= 0;
+            wb_pc_E <= 0;
+            rd_addr_E <= 0;
+            mm_re_M <= 0;
+            mm_we_M <= 0;
+            funct3_M <= 0;
+            wb_ieu_M <= 0;
+            wb_lsu_M <= 0;
+            wb_pc_M <= 0;
+            rd_addr_M <= 0;
+            wb_ieu_W <= 0;
+            wb_lsu_W <= 0;
+            wb_pc_W <= 0;
+            rd_addr_W <= 0;
+        end else 
+        begin
         if(!(stall_D | stall_M | !reset_n)) begin
             jump_E <= jump_D;
             branch_E <= branch_D;
@@ -211,6 +239,7 @@ module decoder #(
             wb_lsu_W <= 0;
             wb_pc_W <= 0;
             rd_addr_W <= 0;
+        end
         end
     end
 
