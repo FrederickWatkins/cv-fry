@@ -4,7 +4,7 @@ use cv_fry::utils::dut::DUT;
 
 fn main() {
     let mut core = Core::new();
-    let binary = concat!(env!("CARGO_MANIFEST_DIR"), "/target/stresstest.bin");
+    let binary = concat!(env!("OUT_DIR"), "/stresstest.bin");
     let mut memory = std::fs::read(binary).unwrap();
     memory.resize(0x1000000, 0);
     let mut instr_bus = C2cR::new(0);
@@ -41,18 +41,10 @@ fn main() {
             core.get_dw_data(),
         );
         core.set_dw_ack(data_w_ack as u8);
-        if (core.get_dw_addr() == 0x2000
-            || core.get_dw_addr() == 0x2004
-            || core.get_dw_addr() == 0x2008
-            || core.get_dw_addr() == 0x2012)
-            && core.get_dw_we() == 1
-        {
-            println!("{:x} {:x}", core.get_dw_addr(), core.get_dw_data());
-        }
         core.tick();
     }
-    for i in 0..10 {
-        println!("{:x} 0x{:x}{:x}{:x}{:x}", i*4 +0x2000, memory[i*4 +0x2003], memory[i*4 +0x2002], memory[i*4 +0x2001], memory[i*4 +0x2000]);
+    for i in 0..23 {
+        println!("{:08x} 0x{:02x}{:02x}{:02x}{:02x}", i*4 +0x00002000, memory[i*4 +0x2003], memory[i*4 +0x2002], memory[i*4 +0x2001], memory[i*4 +0x2000]);
     }
 }
 

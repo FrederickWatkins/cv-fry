@@ -177,7 +177,7 @@ module decoder #(
             wb_pc_E <= wb_pc_D;
             rd_addr_E <= rd_addr_D;
         end
-        else if(stall_D | !reset_n) begin
+        else if((stall_D & !stall_M) | !reset_n) begin
             jump_E <= 0;
             branch_E <= 0;
             op1_pc_E <= 0;

@@ -167,7 +167,6 @@ mod tests {
         ifu.reset();
         assert_eq!(ifu.get_curr_pc(), 0);
         for i in 0..40 {
-            println!("{:x} {} {} {ack}", ifu.get_instr_out(), ifu.get_addr(), i);
             if !ack {
                 assert_eq!(ifu.get_instr_out(), 0x00000004)
             }

@@ -107,6 +107,90 @@ fn main() {
 
     c_builder.compile("verilated_cpp");
 
-    println!("cargo:rerun-if-changed=src/");
-    println!("cargo:rerun-if-changed=test/pc/pc.cpp");
+    let program_src_dir = PathBuf::from("programs/c");
+    let linker_script = "programs/linker.ld";
+    let entry_asm = "programs/entry.S";
+
+    println!("cargo:rerun-if-changed={}", program_src_dir.display());
+    println!("cargo:rerun-if-changed={}", linker_script);
+    println!("cargo:rerun-if-changed={}", entry_asm);
+
+    let entries = fs::read_dir(&program_src_dir).unwrap();
+    for entry in entries {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.extension().and_then(|s| s.to_str()) == Some("c") {
+            let stem = path.file_stem().unwrap().to_str().unwrap();
+            let elf_out = out_dir.join(format!("{}.elf", stem));
+            let bin_out = out_dir.join(format!("{}.bin", stem));
+
+            // Compile C + Entry.S -> ELF
+            let clang_status = Command::new("clang")
+                .args(&[
+                    "--target=riscv32",
+                    "-march=rv32i",
+                    "-mabi=ilp32",
+                    "-ffreestanding",
+                    "-nostdlib",
+                    "-static",
+                    "-fuse-ld=lld",
+                    "-T", linker_script,
+                    "-o", elf_out.to_str().unwrap(),
+                    entry_asm,
+                    path.to_str().unwrap(),
+                ])
+                .status()
+                .expect("Failed to run clang");
+
+            if !clang_status.success() {
+                panic!("Failed to compile test program: {}", stem);
+            }
+
+            // ELF -> BIN
+            Command::new("llvm-objcopy")
+                .args(&[
+                    "-O", "binary",
+                    "--only-section=.text",
+                    elf_out.to_str().unwrap(),
+                    bin_out.to_str().unwrap(),
+                ])
+                .status()
+                .expect("Failed to run llvm-objcopy");
+        }
+    }
+
+    // 2. Run nested cargo build
+    let status = Command::new("cargo")
+        .current_dir("programs/rust")
+        .env_remove("RUSTFLAGS")
+        .env_remove("CARGO_ENCODED_RUSTFLAGS")
+        .args(&[
+            "build",
+            "--release",
+        ])
+        .status()
+        .expect("Failed to build Rust test payloads");
+
+    if !status.success() {
+        panic!("Nested Cargo build failed");
+    }
+
+    // 3. Locate the ELF and convert to BIN
+    // Cargo places nested builds in a specific target folder
+    let elf_path = PathBuf::from("programs/rust/target")
+        .join("riscv32i-unknown-none-elf")
+        .join("release/cv-fry-programs");
+    
+    let bin_out = out_dir.join("rust_test.bin");
+
+    Command::new("llvm-objcopy")
+        .args(&[
+            "-O", "binary",
+            "--only-section=.text",
+            elf_path.to_str().unwrap(),
+            bin_out.to_str().unwrap(),
+        ])
+        .status()
+        .expect("Failed to extract Rust binary");
 }

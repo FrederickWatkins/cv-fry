@@ -73,7 +73,6 @@ fn main() -> BError {
 
     // Dummy buffer: Fill with '!' in light green on black
     let mut fake_buffer = vec![0; WIDTH * HEIGHT * 2];
-    println!("{}", fake_buffer.len());
     for i in 0..(WIDTH * HEIGHT) {
         fake_buffer[i * 2] = 33;    // ASCII '!'
         fake_buffer[i * 2 + 1] = 0x02; // Green foreground, Black background

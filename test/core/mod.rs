@@ -143,7 +143,6 @@ mod tests {
             (ack, instr) = instr_bus.respond(&riscv_machine_code, core.get_instr_re()==1, core.get_instr_sel(), core.get_instr_addr());
             core.set_instr_ack(ack as u8);
             core.set_instr_data(instr);
-            println!("{:x}", instr);
             core.tick();
         }
 
@@ -153,13 +152,38 @@ mod tests {
 
     #[test]
     fn stresstest() {
+        let expected_results: [u32; 23] = [
+            0x12345E77, // [0]  ADDI (a + 0x7FF)
+            0x12344E78, // [1]  ADDI (a - 0x800)
+            0x00000000, // [2]  SLTI (a < 0x100) -> False
+            0x00000001, // [3]  SLTIU (a < 0x7FFFFFFF) -> True
+            0x12345987, // [4]  XORI
+            0x12345679, // [5]  ORI
+            0x00000228, // [6]  ANDI
+            0x000000F0, // [7]  SLLI (0x8000000F << 4)
+            0x08000000, // [8]  SRLI (Logical Shift Right)
+            0xF8000000, // [9]  SRAI (Arithmetic Shift Right - Sign preserved)
+            0xFFFFFFFF, // [10] ADD (0x55555555 + 0xAAAAAAAA)
+            0xAAAAAAAB, // [11] SUB (0x55555555 - 0xAAAAAAAA)
+            0xFFFFFFFF, // [12] XOR
+            0xFFFFFFFF, // [13] OR
+            0x00000000, // [14] AND
+            0x00000000, // [15] SLT (Signed: Positive < Negative) -> False
+            0x0000000B, // [16] branch_check (Sum of successful branches: 1 + 2 + 8)
+            0x44332211, // [17] LW (Little-endian load)
+            0x00006655, // [18] LH
+            0xFFFFFF88, // [19] LB (Sign extended 0x88)
+            0x00000088, // [20] LBU (Zero extended 0x88)
+            0xABCDE000, // [21] LUI (Upper immediate)
+            0xDEADBEEF  // [22] Final Success Marker
+        ];
         let mut core = Core::new();
-        let binary = concat!(env!("CARGO_MANIFEST_DIR"), "/target/stresstest.bin");
+        let binary = concat!(env!("OUT_DIR"), "/stresstest.bin");
         let mut memory = std::fs::read(binary).unwrap();
         memory.resize(0x1000000, 0);
-        let mut instr_bus = C2cR::new(1);
-        let mut data_bus_r = C2cR::new(1);
-        let mut data_bus_w = C2cW::new(1);
+        let mut instr_bus = C2cR::new(0);
+        let mut data_bus_r = C2cR::new(0);
+        let mut data_bus_w = C2cW::new(0);
         let mut instr_ack;
         let mut data_r_ack;
         let mut data_r;
@@ -175,11 +199,11 @@ mod tests {
             core.set_dr_data(data_r);
             data_w_ack = data_bus_w.respond(&mut memory, core.get_dw_we()==1, core.get_dw_sel(), core.get_dw_addr(), core.get_dw_data());
             core.set_dw_ack(data_w_ack as u8);
-            if (core.get_dw_addr() == 0x2000 || core.get_dw_addr() == 0x2004 || core.get_dw_addr() == 0x2008 || core.get_dw_addr() == 0x2012) && core.get_dw_we() == 1 {
-                println!("{:x}", core.get_dw_data());
-            }
             core.tick();
         }
-        assert!(false);
+        for i in 0..23 {
+            let test_result = u32::from_le_bytes(memory[(0x2000 + i * 4)..(0x2000 + i * 4 + 4)].try_into().unwrap());
+            assert_eq!(test_result, expected_results[i]);
+        }
     }
 }
