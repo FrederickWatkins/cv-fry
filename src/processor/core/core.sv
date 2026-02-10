@@ -109,6 +109,7 @@ module core #(
         .lsu_data(lsu_data_W),
         .ieu_result(ieu_result_W),
         .inc_pc(inc_pc_W),
+        .stall(stall_M),
         .wb_ieu(wb_ieu_W),
         .wb_lsu(wb_lsu_W),
         .wb_pc(wb_pc_W),
@@ -127,6 +128,7 @@ module core #(
         .alu_funct3(alu_funct3_E), .funct3(funct3_E),
         .funct7(funct7_E),
         .rs1_data(rs1_data_E), .rs2_data(rs2_data_E), .imm(imm_E), .curr_pc(curr_pc_E),
+        .stall(stall_M),
         // Comb outputs
         .jack(jack_E),
         .je(je_E),

@@ -27,40 +27,43 @@ module core_shim #(
 );
 
     // Internal Interface Instances
-    c2c_r #(.XLEN(XLEN)) instr_bus_if ();
-    c2c_r #(.XLEN(XLEN)) data_bus_r_if ();
-    c2c_w #(.XLEN(XLEN)) data_bus_w_if ();
+    c2c_r #(.XLEN(XLEN)) instr_bus ();
+    c2c_r #(.XLEN(XLEN)) data_bus_r ();
+    c2c_w #(.XLEN(XLEN)) data_bus_w ();
 
     // Instruction Bus Mapping
-    assign instr_bus_if.ack = instr_ack;
-    assign instr_bus_if.data = instr_data;
-    assign instr_re   = instr_bus_if.re;
-    assign instr_sel  = instr_bus_if.sel;
-    assign instr_addr = instr_bus_if.addr;
+    assign instr_bus.ack = instr_ack;
+    assign instr_bus.data = instr_data;
 
     // Data Read Bus Mapping
-    assign data_bus_r_if.ack = dr_ack;
-    assign data_bus_r_if.data = dr_data;
-    assign dr_re      = data_bus_r_if.re;
-    assign dr_sel     = data_bus_r_if.sel;
-    assign dr_addr    = data_bus_r_if.addr;
+    assign data_bus_r.ack = dr_ack;
+    assign data_bus_r.data = dr_data;
 
     // Data Write Bus Mapping
-    assign data_bus_w_if.ack = dw_ack;
-    assign dw_we      = data_bus_w_if.we;
-    assign dw_sel     = data_bus_w_if.sel;
-    assign dw_addr    = data_bus_w_if.addr;
-    assign dw_data    = data_bus_w_if.data;
+    assign data_bus_w.ack = dw_ack;
+
+    always_ff @(posedge clk) begin
+        instr_re <= instr_bus.re;
+        instr_sel <= instr_bus.sel;
+        instr_addr <= instr_bus.addr;
+        dr_re <= data_bus_r.re;
+        dr_sel <= data_bus_r.sel;
+        dr_addr <= data_bus_r.addr;
+        dw_we <= data_bus_w.we;
+        dw_sel <= data_bus_w.sel;
+        dw_addr <= data_bus_w.addr;
+        dw_data <= data_bus_w.data;
+    end
 
     // DUT Instantiation
     core #(
         .XLEN(XLEN)
-    ) core_inst (
+    ) core (
         .clk,
         .reset_n,
-        .instr_bus(instr_bus_if.master),
-        .data_bus_r(data_bus_r_if.master),
-        .data_bus_w(data_bus_w_if.master)
+        .instr_bus(instr_bus.master),
+        .data_bus_r(data_bus_r.master),
+        .data_bus_w(data_bus_w.master)
     );
 
 endmodule

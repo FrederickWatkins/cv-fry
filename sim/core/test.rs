@@ -7,9 +7,9 @@ fn main() {
     let binary = concat!(env!("CARGO_MANIFEST_DIR"), "/target/stresstest.bin");
     let mut memory = std::fs::read(binary).unwrap();
     memory.resize(0x1000000, 0);
-    let mut instr_bus = C2cR::new(1);
-    let mut data_bus_r = C2cR::new(1);
-    let mut data_bus_w = C2cW::new(1);
+    let mut instr_bus = C2cR::new(0);
+    let mut data_bus_r = C2cR::new(0);
+    let mut data_bus_w = C2cW::new(0);
     let mut instr_ack;
     let mut data_r_ack;
     let mut data_r;
@@ -47,12 +47,12 @@ fn main() {
             || core.get_dw_addr() == 0x2012)
             && core.get_dw_we() == 1
         {
-            println!("{:x}", core.get_dw_data());
+            println!("{:x} {:x}", core.get_dw_addr(), core.get_dw_data());
         }
         core.tick();
     }
     for i in 0..10 {
-        println!("0x{}{}{}{}", memory[i*4 +0x2003], memory[i*4 +0x2002], memory[i*4 +0x2001], memory[i*4 +0x2000]);
+        println!("{:x} 0x{:x}{:x}{:x}{:x}", i*4 +0x2000, memory[i*4 +0x2003], memory[i*4 +0x2002], memory[i*4 +0x2001], memory[i*4 +0x2000]);
     }
 }
 

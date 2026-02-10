@@ -46,7 +46,9 @@ fn main() {
         ),
     ];
 
-    for (prefix, path, _, deps) in targets.clone() {
+    for (prefix, path, cpp, deps) in targets.clone() {
+        println!("cargo:rerun-if-changed={path}");
+        println!("cargo:rerun-if-changed={cpp}");
         let mut args = vec![
                 "-Wall",
                 "--cc",

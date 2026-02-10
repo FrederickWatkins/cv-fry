@@ -34,6 +34,7 @@ module ifu #(
     assign instr_bus.sel = 4'b1111;
 
     always_comb begin
+        next_state = curr_state;
         pc_stall = stall | !instr_bus.ack;
         case(curr_state)
         RUNNING: begin

@@ -13,18 +13,18 @@ impl C2cW {
             if self.request_latency == 0 {
                 for i in 0..4 {
                     if (sel >> i) & 1 == 1 {
-                        memory[addr as usize + i] = ((data >> i) & 0xFF) as u8;
+                        memory[addr as usize + i] = ((data >> i * 8) & 0xFF) as u8;
                     }
                 }
                 self.request_latency = self.delay;
                 true
             } else {
                 self.request_latency -= 1;
-                true
+                false
             }
         } else {
             self.request_latency = self.delay;
-            true
+            false
         }
     }
 }

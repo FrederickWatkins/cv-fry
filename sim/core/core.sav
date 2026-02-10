@@ -1,0 +1,85 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Tue Feb 10 02:59:52 2026
+[*]
+[dumpfile] "/home/freddie/Developement/cv-fry/core.vcd"
+[dumpfile_mtime] "Tue Feb 10 02:58:23 2026"
+[dumpfile_size] 418849
+[savefile] "/home/freddie/Developement/cv-fry/sim/core/core.sav"
+[timestart] 7381
+[size] 1920 1001
+[pos] -27 -24
+*-5.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.core_shim.
+[treeopen] TOP.core_shim.core_inst.
+[sst_width] 268
+[signals_width] 158
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@28
+TOP.clk
+TOP.dr_ack
+@22
+TOP.dr_addr[31:0]
+TOP.dr_data[31:0]
+@28
+TOP.dr_re
+@22
+TOP.dr_sel[3:0]
+@28
+TOP.dw_ack
+@22
+TOP.dw_addr[31:0]
+TOP.dw_data[31:0]
+TOP.dw_sel[3:0]
+@28
+TOP.dw_we
+TOP.instr_ack
+@22
+TOP.instr_addr[31:0]
+TOP.instr_data[31:0]
+@28
+TOP.instr_re
+@22
+TOP.instr_sel[3:0]
+@28
+TOP.reset_n
+@c00201
+-RF
+@22
+TOP.core_shim.core_inst.rf.ram[1][31:0]
+TOP.core_shim.core_inst.rf.ram[2][31:0]
+TOP.core_shim.core_inst.rf.ram[3][31:0]
+TOP.core_shim.core_inst.rf.ram[4][31:0]
+TOP.core_shim.core_inst.rf.ram[5][31:0]
+TOP.core_shim.core_inst.rf.ram[6][31:0]
+TOP.core_shim.core_inst.rf.ram[7][31:0]
+TOP.core_shim.core_inst.rf.ram[8][31:0]
+TOP.core_shim.core_inst.rf.ram[9][31:0]
+TOP.core_shim.core_inst.rf.ram[10][31:0]
+TOP.core_shim.core_inst.rf.ram[11][31:0]
+TOP.core_shim.core_inst.rf.ram[12][31:0]
+TOP.core_shim.core_inst.rf.ram[13][31:0]
+TOP.core_shim.core_inst.rf.ram[14][31:0]
+TOP.core_shim.core_inst.rf.ram[15][31:0]
+TOP.core_shim.core_inst.rf.ram[16][31:0]
+TOP.core_shim.core_inst.rf.ram[17][31:0]
+TOP.core_shim.core_inst.rf.ram[18][31:0]
+TOP.core_shim.core_inst.rf.ram[19][31:0]
+TOP.core_shim.core_inst.rf.ram[20][31:0]
+TOP.core_shim.core_inst.rf.ram[21][31:0]
+TOP.core_shim.core_inst.rf.ram[22][31:0]
+TOP.core_shim.core_inst.rf.ram[23][31:0]
+TOP.core_shim.core_inst.rf.ram[24][31:0]
+TOP.core_shim.core_inst.rf.ram[25][31:0]
+TOP.core_shim.core_inst.rf.ram[26][31:0]
+TOP.core_shim.core_inst.rf.ram[27][31:0]
+TOP.core_shim.core_inst.rf.ram[28][31:0]
+TOP.core_shim.core_inst.rf.ram[29][31:0]
+TOP.core_shim.core_inst.rf.ram[30][31:0]
+TOP.core_shim.core_inst.rf.ram[31][31:0]
+@1401201
+-RF
+[pattern_trace] 1
+[pattern_trace] 0

@@ -16,6 +16,7 @@ module ieu #(
     input logic [XLEN-1:0] rs2_data,
     input logic [XLEN-1:0] imm,
     input logic [XLEN-1:0] curr_pc,
+    input logic stall,
 
     // Comb outputs
     output logic jack,
@@ -33,14 +34,14 @@ module ieu #(
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin
             result <= '0;
-        end else begin
+        end else if (!stall) begin
             result <= alu_result_comb;
         end
     end
 
     alu #(
         .XLEN(XLEN)
-    ) alu_inst (
+    ) alu (
         .funct3(alu_funct3),
         .funct7,
         .operand_1(op1_pc?curr_pc:rs1_data),
@@ -51,7 +52,7 @@ module ieu #(
 
     jbu #(
         .XLEN(XLEN)
-    ) jbu_inst (
+    ) jbu (
         .jump,
         .branch,
         .funct3,
