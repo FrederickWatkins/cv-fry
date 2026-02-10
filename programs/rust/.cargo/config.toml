@@ -16,6 +16,7 @@ rustflags = [
     "-C", "link-arg=--no-relax",
     "-C", "relocation-model=static",
     "-C", "no-redzone",
+    "--cfg", "portable_atomic_unsafe_assume_single_core",
 ]
 
 [profile.release]
