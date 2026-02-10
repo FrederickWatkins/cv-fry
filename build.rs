@@ -151,7 +151,7 @@ fn main() {
             Command::new("llvm-objcopy")
                 .args(&[
                     "-O", "binary",
-                    "--only-section=.text",
+                    "--strip-all",
                     elf_out.to_str().unwrap(),
                     bin_out.to_str().unwrap(),
                 ])
@@ -159,6 +159,8 @@ fn main() {
                 .expect("Failed to run llvm-objcopy");
         }
     }
+
+    println!("cargo:rerun-if-changed=programs/rust/src");
 
     // 2. Run nested cargo build
     let status = Command::new("cargo")
@@ -187,7 +189,7 @@ fn main() {
     Command::new("llvm-objcopy")
         .args(&[
             "-O", "binary",
-            "--only-section=.text",
+            "--strip-all",
             elf_path.to_str().unwrap(),
             bin_out.to_str().unwrap(),
         ])

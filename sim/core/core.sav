@@ -1,18 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Tue Feb 10 05:53:06 2026
+[*] Tue Feb 10 09:10:38 2026
 [*]
 [dumpfile] "/home/freddie/Developement/cv-fry/core.vcd"
-[dumpfile_mtime] "Tue Feb 10 05:32:54 2026"
-[dumpfile_size] 514654
+[dumpfile_mtime] "Tue Feb 10 08:53:23 2026"
+[dumpfile_size] 98343
 [savefile] "/home/freddie/Developement/cv-fry/sim/core/core.sav"
-[timestart] 461
-[size] 1335 1001
+[timestart] 675
+[size] 1329 1001
 [pos] -7 -4
-*-5.000000 477 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.000000 732 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_shim.
 [treeopen] TOP.core_shim.core.
+[treeopen] TOP.core_shim.core.ieu.
 [sst_width] 268
 [signals_width] 235
 [sst_expanded] 1
@@ -159,5 +160,34 @@ TOP.core_shim.core.decoder.wb_pc_M
 TOP.core_shim.core.decoder.wb_pc_W
 @1000201
 -Decoder
+@28
+TOP.core_shim.core.ifu.compressed
+@22
+TOP.core_shim.core.ifu.curr_pc[31:0]
+@28
+TOP.core_shim.core.ifu.curr_state
+@22
+TOP.core_shim.core.ifu.inc_pc[31:0]
+TOP.core_shim.core.ifu.instr_decomp[31:2]
+TOP.core_shim.core.ifu.instr_out[31:2]
+TOP.core_shim.core.ifu.ja[31:0]
+@28
+TOP.core_shim.core.ifu.jack
+TOP.core_shim.core.ifu.je
+TOP.core_shim.core.ifu.jump
+@22
+TOP.core_shim.core.ifu.next_pc[31:0]
+@28
+TOP.core_shim.core.ifu.next_state
+TOP.core_shim.core.ifu.pc_stall
+TOP.core_shim.core.ifu.reset_n
+TOP.core_shim.core.ifu.stall
+TOP.core_shim.core.ieu.alu.funct3[2:0]
+@22
+TOP.core_shim.core.ieu.alu.funct7[6:0]
+TOP.core_shim.core.ieu.alu.operand_1[31:0]
+TOP.core_shim.core.ieu.alu.operand_2[31:0]
+TOP.core_shim.core.ieu.alu.result[31:0]
+TOP.core_shim.core.ieu.alu.shamt_len[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

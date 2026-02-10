@@ -13,6 +13,8 @@ build-std = ["core", "compiler_builtins"]
 # Move your linker script and other flags here
 rustflags = [
     "-C", "link-arg=-T../linker.ld",
+    "-C", "link-arg=--no-relax",
+    "-C", "relocation-model=static",
     "-C", "no-redzone",
 ]
 

@@ -1,18 +1,57 @@
+mod vcore;
+use vcore::Core;
+
+use cv_fry::utils::c2c_r::C2cR;
+use cv_fry::utils::c2c_w::C2cW;
+use cv_fry::utils::dut::DUT;
+
 use bracket_lib::prelude::*;
 
 const WIDTH: usize = 80;
 const HEIGHT: usize = 25;
 
 struct State {
-    vga_buffer: Vec<u8>,
+    memory: Vec<u8>,
+    core: Core,
+    instr_bus: C2cR,
+    data_bus_r: C2cR,
+    data_bus_w: C2cW,
+    cycles_per_refresh: usize,
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls(); // Clear the screen
+        for _ in 0..self.cycles_per_refresh {
+            let (instr_ack, instr) = self.instr_bus.respond(
+                &self.memory,
+                self.core.get_instr_re() == 1,
+                self.core.get_instr_sel(),
+                self.core.get_instr_addr(),
+            );
+            self.core.set_instr_ack(instr_ack as u8);
+            self.core.set_instr_data(instr);
+            let (data_r_ack, data_r) = self.data_bus_r.respond(
+                &self.memory,
+                self.core.get_dr_re() == 1,
+                self.core.get_dr_sel(),
+                self.core.get_dr_addr(),
+            );
+            self.core.set_dr_ack(data_r_ack as u8);
+            self.core.set_dr_data(data_r);
+            let data_w_ack = self.data_bus_w.respond(
+                &mut self.memory,
+                self.core.get_dw_we() == 1,
+                self.core.get_dw_sel(),
+                self.core.get_dw_addr(),
+                self.core.get_dw_data(),
+            );
+            self.core.set_dw_ack(data_w_ack as u8);
+            self.core.tick();
+        }
         
         // 1. Render the buffer
-        for (i, chunk) in self.vga_buffer.chunks(2).enumerate() {
+        for (i, chunk) in self.memory[0xb8000..0xb8000 + WIDTH * HEIGHT * 2].chunks(2).enumerate() {
             let x = (i % WIDTH) as i32;
             let y = (i / WIDTH) as i32;
 
@@ -60,7 +99,6 @@ fn u8_to_cp437_color(idx: u8) -> RGB {
 
 fn main() -> BError {
     unsafe {std::env::set_var("WINIT_UNIX_BACKEND", "x11");}
-    // We create an 80x25 window using the built-in 8x16 VGA font
     let context = BTermBuilder::new()
         .with_title("VGA Text Mode Emulator")
         .with_dimensions(WIDTH, HEIGHT)
@@ -68,16 +106,16 @@ fn main() -> BError {
         .with_font("vga8x16.png", 8, 16) // This filename is internal to the crate
         .with_simple_console(WIDTH, HEIGHT, "vga8x16.png")
         .with_advanced_input(true)
-        .with_vsync(true)
         .build()?;
 
-    // Dummy buffer: Fill with '!' in light green on black
-    let mut fake_buffer = vec![0; WIDTH * HEIGHT * 2];
-    for i in 0..(WIDTH * HEIGHT) {
-        fake_buffer[i * 2] = 33;    // ASCII '!'
-        fake_buffer[i * 2 + 1] = 0x02; // Green foreground, Black background
-    }
-
-    let gs = State { vga_buffer: fake_buffer };
+    let mut core = Core::new();
+    let binary = concat!(env!("OUT_DIR"), "/rust_test.bin");
+    let mut memory = std::fs::read(binary).unwrap();
+    memory.resize(0x1000000, 0);
+    let instr_bus = C2cR::new(0);
+    let data_bus_r = C2cR::new(0);
+    let data_bus_w = C2cW::new(0);
+    core.reset();
+    let gs = State { memory, core, instr_bus, data_bus_r, data_bus_w, cycles_per_refresh: 1 };
     main_loop(context, gs)
 }
