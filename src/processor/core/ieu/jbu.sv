@@ -31,7 +31,7 @@ module jbu #(
             BGE: je = $signed(rs1_data) >= $signed(rs2_data);
             BLTU: je = rs1_data < rs2_data;
             BGEU: je = rs1_data >= rs2_data;
-            default: $warning("Unrecognised branch funct3");
+            default: ;
             endcase
         end
         if(jump) begin

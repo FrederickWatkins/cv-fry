@@ -2,7 +2,7 @@
 module hc (
     input logic [4:0] rs1_addr_D,
     input logic [4:0] rs2_addr_D,
-    input logic [4:0] rd_addr [2:0],
+    input logic [4:0][2:0] rd_addr,
 
     output logic stall_D
 );

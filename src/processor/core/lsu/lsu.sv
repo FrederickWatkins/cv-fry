@@ -41,6 +41,16 @@ module lsu #(
     assign data_bus_w.data = rs2_data;
     
     always_comb begin
+        // --- 1. DEFAULT ASSIGNMENTS (The Latch Killers) ---
+    next_state    = curr_state;
+    stall         = 0;
+    output_data   = 0;
+    data_bus_r.re = 0;
+    data_bus_w.we = 0;
+    
+    // These must also be initialized
+    data_bus_r.sel = 4'b1111; 
+    data_bus_w.sel = 4'b1111;
         next_state = curr_state;
         case(funct3[1:0])
         BYTE: begin
@@ -63,7 +73,7 @@ module lsu #(
         case(curr_state)
         IDLE: begin
             stall = 0;
-            output_data = 'x;
+            output_data = 0;
             data_bus_r.re = 0;
             data_bus_w.we = 0;
             if(mm_re) begin
@@ -86,7 +96,7 @@ module lsu #(
                 {UNSIGNED, BYTE}: output_data = {{(XLEN-8){1'b0}}, data_bus_r.data[7:0]};
                 {UNSIGNED, HALF}: output_data = {{(XLEN-16){1'b0}}, data_bus_r.data[15:0]};
                 {UNSIGNED, WORD}: output_data = {{(XLEN-32){1'b0}}, data_bus_r.data[31:0]};
-                default: output_data = 'x;
+                default: output_data = 0;
             endcase
             data_bus_r.re = 1;
             data_bus_w.we = 0;
@@ -98,7 +108,7 @@ module lsu #(
         end
         WRITE: begin
             stall = 1;
-            output_data = 'x;
+            output_data = 0;
             data_bus_r.re = 0;
             data_bus_w.we = 1;
             if(data_bus_w.ack) begin
@@ -113,7 +123,10 @@ module lsu #(
 
     always_ff @(posedge clk or negedge reset_n) begin
         curr_state <= next_state;
-        if(!reset_n) curr_state <= IDLE;
         data <= output_data;
+        if(!reset_n) begin
+            curr_state <= IDLE;
+            data       <= {XLEN{1'b0}}; // Explicitly reset data to 0
+        end
     end
 endmodule

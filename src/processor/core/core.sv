@@ -34,6 +34,14 @@ module core #(
     logic [XLEN-1:0] ja_E;
 
     always_ff @(posedge clk or negedge reset_n) begin
+        if(!reset_n) begin
+            curr_pc_E <= 0;
+            inc_pc_E <= 0;
+            inc_pc_M <= 0;
+            inc_pc_W <= 0;
+            rs2_data_M <= 0;
+            ieu_result_W <= 0;
+        end else begin
         if(!(stall_D | stall_M)) begin
             curr_pc_E <= curr_pc_D;
             inc_pc_E <= inc_pc_D;
@@ -44,13 +52,6 @@ module core #(
             rs2_data_M <= rs2_data_E;
             ieu_result_W <= ieu_result_M;
         end
-        if(!reset_n) begin
-            curr_pc_E <= 0;
-            inc_pc_E <= 0;
-            inc_pc_M <= 0;
-            inc_pc_W <= 0;
-            rs2_data_M <= 0;
-            ieu_result_W <= 0;
         end
     end
 
