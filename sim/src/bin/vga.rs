@@ -1,9 +1,8 @@
-mod vcore;
-use vcore::Core;
+use cv_fry_sim::core::Core;
 
-use cv_fry::utils::c2c_r::C2cR;
-use cv_fry::utils::c2c_w::C2cW;
-use cv_fry::utils::dut::DUT;
+use cv_fry_sim::utils::c2c_r::C2cR;
+use cv_fry_sim::utils::c2c_w::C2cW;
+use cv_fry_sim::utils::dut::DUT;
 
 use bracket_lib::prelude::*;
 
@@ -109,7 +108,7 @@ fn main() -> BError {
         .build()?;
 
     let mut core = Core::new();
-    let binary = concat!(env!("OUT_DIR"), "/rust_test.bin");
+    let binary = env!("PAYLOAD_CV-FRY-PAYLOAD-RS");
     let mut memory = std::fs::read(binary).unwrap();
     memory.resize(0x1000000, 0);
     let instr_bus = C2cR::new(0);

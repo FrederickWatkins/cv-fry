@@ -150,7 +150,7 @@ mod tests {
             0xDEADBEEF  // [22] Final Success Marker
         ];
         let mut core = Core::new();
-        let binary = "../../../../target/stresstest.bin";
+        let binary = env!("PAYLOAD_STRESSTEST");
         let mut memory = std::fs::read(binary).unwrap();
         memory.resize(0x1000000, 0);
         let mut instr_bus = C2cR::new(0);

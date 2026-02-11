@@ -2,9 +2,17 @@
 name = "cv-fry-sim"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
 
 [dependencies]
+bracket-lib = "0.8.7"
 cv-fry-cpp = { path = "../cpp" }
+cv-fry-payload = { path = "../payload"}
+
 
 [dev-dependencies]
 proptest = "1.10.0"
+
+[build-dependencies]
+toml = "0.9.12"
+

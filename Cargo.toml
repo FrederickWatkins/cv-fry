@@ -1,3 +1,4 @@
 [workspace]
 members = ["cpp", "sv", "payload", "sim"]
 resolver = "3"
+exclude = ["payload/rust"]

@@ -1,0 +1,3 @@
+[alias]
+t = "test --lib -p cv-fry-sim"
+vga = "run --bin vga -p cv-fry-sim"

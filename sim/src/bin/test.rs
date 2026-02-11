@@ -1,9 +1,7 @@
-mod vcore;
-
-use vcore::Core;
-use cv_fry::utils::c2c_r::C2cR;
-use cv_fry::utils::c2c_w::C2cW;
-use cv_fry::utils::dut::DUT;
+use cv_fry_sim::core::Core;
+use cv_fry_sim::utils::c2c_r::C2cR;
+use cv_fry_sim::utils::c2c_w::C2cW;
+use cv_fry_sim::utils::dut::DUT;
 
 fn main() {
     let mut core = Core::new();
@@ -47,6 +45,13 @@ fn main() {
         core.tick();
     }
     for i in 0..23 {
-        println!("{:08x} 0x{:02x}{:02x}{:02x}{:02x}", i*4 +0x00002000, memory[i*4 +0x2003], memory[i*4 +0x2002], memory[i*4 +0x2001], memory[i*4 +0x2000]);
+        println!(
+            "{:08x} 0x{:02x}{:02x}{:02x}{:02x}",
+            i * 4 + 0x00002000,
+            memory[i * 4 + 0x2003],
+            memory[i * 4 + 0x2002],
+            memory[i * 4 + 0x2001],
+            memory[i * 4 + 0x2000]
+        );
     }
 }
