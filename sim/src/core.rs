@@ -1,33 +1,5 @@
+use cv_fry_cpp::core::*;
 use crate::utils::dut::DUT;
-
-unsafe extern "C" {
-    fn vcore_init() -> *mut std::ffi::c_void;
-    fn vcore_destroy(dut: *mut std::ffi::c_void);
-    fn vcore_eval(dut: *mut std::ffi::c_void);
-    
-    fn vcore_set_clk(dut: *mut std::ffi::c_void, val: u8);
-    fn vcore_set_reset_n(dut: *mut std::ffi::c_void, val: u8);
-    
-    // Inputs from Memory/Peripherals
-    fn vcore_set_instr_ack(dut: *mut std::ffi::c_void, val: u8);
-    fn vcore_set_instr_data(dut: *mut std::ffi::c_void, val: u32);
-    fn vcore_set_dr_ack(dut: *mut std::ffi::c_void, val: u8);
-    fn vcore_set_dr_data(dut: *mut std::ffi::c_void, val: u32);
-    fn vcore_set_dw_ack(dut: *mut std::ffi::c_void, val: u8);
-
-    // Outputs to Memory/Peripherals
-    fn vcore_get_instr_re(dut: *mut std::ffi::c_void) -> u8;
-    fn vcore_get_instr_addr(dut: *mut std::ffi::c_void) -> u32;
-    fn vcore_get_instr_sel(dut: *mut std::ffi::c_void) -> u8;
-    fn vcore_get_dr_re(dut: *mut std::ffi::c_void) -> u8;
-    fn vcore_get_dr_addr(dut: *mut std::ffi::c_void) -> u32;
-    fn vcore_get_dr_sel(dut: *mut std::ffi::c_void) -> u8;
-    fn vcore_get_dw_we(dut: *mut std::ffi::c_void) -> u8;
-    fn vcore_get_dw_addr(dut: *mut std::ffi::c_void) -> u32;
-    fn vcore_get_dw_data(dut: *mut std::ffi::c_void) -> u32;
-    fn vcore_get_dw_sel(dut: *mut std::ffi::c_void) -> u8;
-
-}
 
 pub struct Core {
     ptr: *mut std::ffi::c_void,

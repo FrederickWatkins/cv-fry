@@ -1,16 +1,6 @@
+use cv_fry_cpp::alu::*;
 use crate::utils::dut::DUT;
 
-// Raw FFI definitions
-unsafe extern "C" {
-    fn valu_init() -> *mut std::ffi::c_void;
-    fn valu_destroy(dut: *mut std::ffi::c_void);
-    fn valu_eval(dut: *mut std::ffi::c_void);
-    fn valu_set_funct3(dut: *mut std::ffi::c_void, val: u8);
-    fn valu_set_funct7(dut: *mut std::ffi::c_void, val: u8);
-    fn valu_set_operand_1(dut: *mut std::ffi::c_void, val: u32);
-    fn valu_set_operand_2(dut: *mut std::ffi::c_void, val: u32);
-    fn valu_get_result(dut: *mut std::ffi::c_void) -> u32;
-}
 pub struct Alu {
     ptr: *mut std::ffi::c_void,
     time: u64,

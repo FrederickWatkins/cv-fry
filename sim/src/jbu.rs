@@ -1,21 +1,5 @@
+use cv_fry_cpp::jbu::*;
 use crate::utils::dut::DUT;
-
-unsafe extern "C" {
-    fn vjbu_init() -> *mut std::ffi::c_void;
-    fn vjbu_destroy(dut: *mut std::ffi::c_void);
-    fn vjbu_eval(dut: *mut std::ffi::c_void);
-    
-    // Setters
-    fn vjbu_set_jump(dut: *mut std::ffi::c_void, val: u8);
-    fn vjbu_set_branch(dut: *mut std::ffi::c_void, val: u8);
-    fn vjbu_set_funct3(dut: *mut std::ffi::c_void, val: u8);
-    fn vjbu_set_rs1_data(dut: *mut std::ffi::c_void, val: u32);
-    fn vjbu_set_rs2_data(dut: *mut std::ffi::c_void, val: u32);
-
-    // Getters
-    fn vjbu_get_jack(dut: *mut std::ffi::c_void) -> u8;
-    fn vjbu_get_je(dut: *mut std::ffi::c_void) -> u8;
-}
 
 pub struct Jbu {
     ptr: *mut std::ffi::c_void,

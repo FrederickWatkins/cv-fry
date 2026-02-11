@@ -68,7 +68,6 @@ name = "cv-fry-sim"
 version = "0.1.0"
 dependencies = [
  "cv-fry-cpp",
- "cv-fry-sv",
  "proptest",
 ]
 
