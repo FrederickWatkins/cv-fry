@@ -4,6 +4,13 @@
 
 <img width="1000" alt="bee movie" src="https://github.com/user-attachments/assets/28ddf982-c860-43d2-9fbf-cd7282e7e649" />
 
+## TODO list
+- Move code into separate crates in cargo workspace to allow incremental building of cpp
+- Pull registers out of modules and into generic pipeline regs
+- Add result forwarding
+- Add muldiv instructions
+- Separate muldiv into own unit with ready signal to allow variable length pipeline, add valid and ready signals to pipeline regs
+
 ## Questions
 - Q: Is that your processor printing the entire script of the bee movie to a memory mapped vga buffer? A: Yes.
 - Q: If this was a project to learn hardware design why is most of the repo unit tests in rust? A: Unfortunately it seems writing tests is most of the job. If I have to write hundreds of unit tests, I'm not doing it in c++.
