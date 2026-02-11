@@ -5,7 +5,7 @@
 <img width="1000" alt="bee movie" src="https://github.com/user-attachments/assets/28ddf982-c860-43d2-9fbf-cd7282e7e649" />
 
 ## TODO list
-- Move code into separate crates in cargo workspace to allow incremental building of cpp
+- Move code into separate crates in cargo workspace to allow incremental building of cpp ☑️ Done!
 - Pull registers out of modules and into generic pipeline regs
 - Add result forwarding
 - Add muldiv instructions
