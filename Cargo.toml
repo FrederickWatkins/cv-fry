@@ -1,27 +1,3 @@
-[package]
-name = "cv-fry"
-version = "0.1.0"
-edition = "2024"
-build = "build.rs"
-
-[lib]
-path = "test/lib.rs"
-
-[[bin]]
-name = "simulate-core"
-path = "sim/core/vga.rs"
-
-[[bin]]
-name = "test-core"
-path = "sim/core/test.rs"
-
-[build-dependencies]
-cc = "1.2.55"
-
-[dev-dependencies]
-proptest = "1.10.0"
-
-[dependencies]
-bracket-lib = "0.8.7"
-
-
+[workspace]
+members = ["cpp", "sv", "payload", "sim"]
+resolver = "3"

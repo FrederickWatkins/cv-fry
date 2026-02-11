@@ -1,7 +1,5 @@
 [package]
-name = "cv-fry-programs"
+name = "cv-fry-sv"
 version = "0.1.0"
 edition = "2024"
-
-[dependencies]
-
+build = "build.rs"

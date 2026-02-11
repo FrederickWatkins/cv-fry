@@ -1,0 +1,11 @@
+[package]
+name = "cv-fry-cpp"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[dependencies]
+cv-fry-sv = { path = "../sv" }
+
+[build-dependencies]
+cc = "1.2.55"

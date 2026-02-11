@@ -6,7 +6,7 @@ pub mod vga;
 use core::panic::PanicInfo;
 use core::arch::global_asm;
 
-global_asm!(include_str!("../../../programs/entry.S"));
+global_asm!(include_str!("../entry.S"));
 
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> ! {
