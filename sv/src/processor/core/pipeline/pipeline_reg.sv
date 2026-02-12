@@ -12,8 +12,8 @@ module pipeline_reg #(
     always_ff @(posedge clk or negedge reset_n) begin
         if(!reset_n) signals_out <= NOP;
         else begin
-            if(!stall) signals_out <= signals_in;
             if(flush) signals_out <= NOP;
+            else if(!stall) signals_out <= signals_in;
         end
     end
 endmodule

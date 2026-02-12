@@ -1,0 +1,18 @@
+plugin -i slang
+read_slang -ignore-unknown-modules sv/src/bus/* sv/src/processor/core/pipeline/* sv/src/processor/core/hc/hc.sv\
+    sv/src/processor/core/idu/idu.sv sv/src/processor/core/ieu/ieu.sv sv/src/processor/core/ifu/ifu.sv\
+    sv/src/processor/core/rf/rf.sv sv/src/processor/core/lsu/lsu.sv sv/src/processor/core/* sv/src/shim/core_shim.sv
+
+blackbox pipeline_reg
+
+hierarchy -check -top core_shim
+
+# Instead of 'proc', which flattens logic, use 'hierarchy' 
+# to just resolve the boxes.
+# proc -nomux -noopt
+
+# Clean up without breaking buses
+# opt_clean -purge
+
+show core_shim
+# write_json core_shim.json

@@ -12,6 +12,10 @@ module core (
 
     logic stall_F, stall_D, stall_E, stall_M, stall_W;
     logic flush_F, flush_D, flush_E, flush_M, flush_W;
+    logic je;
+    logic [XLEN-1:0] ja;
+    logic [4:0] rs1_addr, rs2_addr;
+    logic [XLEN-1:0] rs1_data, rs2_data;
     
     decode_signals signals_out_F, signals_in_D;
     execute_signals signals_out_D, signals_in_E;
@@ -39,7 +43,7 @@ module core (
         .reset_n,
         .stall(stall_F),
         .flush(flush_F),
-        .instr_bus,
+        .instr_bus(instr_bus),
         .je,
         .ja,
 
@@ -70,6 +74,10 @@ module core (
     lsu lsu (
         .clk,
         .reset_n,
+
+        .data_bus_r,
+        .data_bus_w,
+
         .signals_in(signals_in_M),
 
         .signals_out(signals_out_M)

@@ -1,3 +1,5 @@
+import pipeline::XLEN;
+
 module core_shim (
     input logic clk,
     input logic reset_n,
