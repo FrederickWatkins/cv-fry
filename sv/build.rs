@@ -38,8 +38,9 @@ fn main() {
             "Vcore",
             "src/shim/core_shim.sv",
             vec![
-                "src/bus",
+                "src/processor/core/pipeline",
                 "src/processor/core",
+                "src/bus",
                 "src/processor/core/decoder",
                 "src/processor/core/ieu",
                 "src/processor/core/ifu",
@@ -54,6 +55,7 @@ fn main() {
         let mut args = vec![
             "-Wall",
             "--cc",
+            "src/processor/core/pipeline/pipeline.sv",
             "--trace",
             "-Isrc",
             "--prefix",

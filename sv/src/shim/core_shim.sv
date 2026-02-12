@@ -1,6 +1,4 @@
-module core_shim #(
-    parameter XLEN = 32
-) (
+module core_shim (
     input logic clk,
     input logic reset_n,
 
@@ -56,9 +54,7 @@ module core_shim #(
     end
 
     // DUT Instantiation
-    core #(
-        .XLEN(XLEN)
-    ) core (
+    core core (
         .clk,
         .reset_n,
         .instr_bus(instr_bus.master),
