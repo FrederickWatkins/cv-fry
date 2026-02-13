@@ -1,5 +1,4 @@
 import pipeline::XLEN;
-
 module core_shim (
     input logic clk,
     input logic reset_n,
@@ -27,9 +26,9 @@ module core_shim (
 );
 
     // Internal Interface Instances
-    c2c_r #(.XLEN(XLEN)) instr_bus ();
-    c2c_r #(.XLEN(XLEN)) data_bus_r ();
-    c2c_w #(.XLEN(XLEN)) data_bus_w ();
+    c2c_r instr_bus ();
+    c2c_r data_bus_r ();
+    c2c_w data_bus_w ();
 
     // Instruction Bus Mapping
     assign instr_bus.ack = instr_ack;

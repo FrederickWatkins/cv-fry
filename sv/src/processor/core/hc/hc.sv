@@ -4,7 +4,7 @@ module hc (
     input logic je,
     input logic busy_M,
 
-    input logic [4:0] rs1_addr, input [4:0] logic rs2_addr,
+    input logic [4:0] rs1_addr, input logic [4:0] rs2_addr,
     input logic [4:0] rd_E,
     input logic [4:0] rd_M,
     input logic [4:0] rd_W,

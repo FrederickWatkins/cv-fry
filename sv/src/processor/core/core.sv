@@ -100,7 +100,7 @@ module core (
     // Fetch-decode pipeline register
     pipeline_reg #(
         .T(decode_signals),
-        .NOP('{'h4, 0, 0})
+        .NOP(decode_signals'{'h4, 0, 0})
     ) pipeline_D (
         .clk,
         .reset_n,
@@ -113,7 +113,7 @@ module core (
     // Decode-exectue pipeline register
     pipeline_reg #(
         .T(execute_signals),
-        .NOP('{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        .NOP(execute_signals'{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
     ) pipeline_E (
         .clk,
         .reset_n,
@@ -126,7 +126,7 @@ module core (
     // Execute-memory pipeline register
     pipeline_reg #(
         .T(memory_signals),
-        .NOP('{0, 0, 0, 0, 0, 0})
+        .NOP(memory_signals'{0, 0, 0, 0, 0, 0})
     ) pipeline_M (
         .clk,
         .reset_n,
@@ -139,7 +139,7 @@ module core (
     // Memory-writeback pipeline register
     pipeline_reg #(
         .T(writeback_signals),
-        .NOP('{0, 0})
+        .NOP(writeback_signals'{0, 0})
     ) pipeline_W (
         .clk,
         .reset_n,

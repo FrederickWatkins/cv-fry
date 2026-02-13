@@ -1,4 +1,5 @@
-import pipeline::*;
+import pipeline::memory_signals;
+import pipeline::writeback_signals;
 // Load store unit
 module lsu (
     c2c_r.master data_bus_r,
@@ -9,6 +10,8 @@ module lsu (
     output logic busy,
     output writeback_signals signals_out
 );
+    import pipeline::*;
+    
     localparam BYTE = 2'b00;
     localparam HALF = 2'b01;
     localparam WORD = 2'b10;
@@ -16,9 +19,9 @@ module lsu (
     localparam SIGNED = 1'b0;
     localparam UNSIGNED = 1'b1;
 
-    assign data_bus_r.addr = signals_out.mm_addr;
-    assign data_bus_w.addr = signals_out.mm_addr;
-    assign data_bus_w.data = signals_out.data;
+    assign data_bus_r.addr = signals_in.mm_addr;
+    assign data_bus_w.addr = signals_in.mm_addr;
+    assign data_bus_w.data = signals_in.data;
 
     assign signals_out.rd_addr = signals_in.rd_addr;
     
@@ -42,12 +45,12 @@ module lsu (
         end
         endcase
         
-        busy_M = 0;
+        busy = 0;
         signals_out.data = signals_in.data;
         data_bus_r.re = 0;
         data_bus_w.we = 0;
         if(signals_in.mm_re) begin
-            busy_M = 1;
+            busy = 1;
             case(signals_in.funct3)
                 {SIGNED, BYTE}: signals_out.data = {{(XLEN-7){data_bus_r.data[7]}}, data_bus_r.data[6:0]};
                 {SIGNED, HALF}: signals_out.data = {{(XLEN-15){data_bus_r.data[15]}}, data_bus_r.data[14:0]};
@@ -60,16 +63,16 @@ module lsu (
             data_bus_r.re = 1;
             data_bus_w.we = 0;
             if(data_bus_r.ack) begin
-                busy_M = 0;
+                busy = 0;
                 data_bus_r.re = 0;
             end
         end
         if(signals_in.mm_we) begin
-            busy_M = 1;
+            busy = 1;
             data_bus_r.re = 0;
             data_bus_w.we = 1;
             if(data_bus_w.ack) begin
-                busy_M = 0;
+                busy = 0;
                 data_bus_w.we = 0;
             end
         end

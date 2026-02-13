@@ -30,18 +30,14 @@ fn main() {
             vec![],
         ),
         (
-            "Vdecoder",
-            "src/processor/core/decoder/decoder.sv",
-            vec!["src/processor/core/decoder/"],
-        ),
-        (
             "Vcore",
             "src/shim/core_shim.sv",
             vec![
                 "src/processor/core/pipeline",
                 "src/processor/core",
                 "src/bus",
-                "src/processor/core/decoder",
+                "src/processor/core/hc",
+                "src/processor/core/idu",
                 "src/processor/core/ieu",
                 "src/processor/core/ifu",
                 "src/processor/core/lsu",

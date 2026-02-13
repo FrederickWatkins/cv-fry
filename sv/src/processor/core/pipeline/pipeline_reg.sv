@@ -1,6 +1,6 @@
 module pipeline_reg #(
-    parameter type T = logic,
-    parameter T NOP = 0
+    parameter type T,
+    parameter NOP
 ) (
     input logic clk,
     input logic reset_n,

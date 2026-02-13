@@ -1,15 +1,20 @@
-import pipeline::*;
+import pipeline::XLEN;
+import pipeline::execute_signals;
+import pipeline::memory_signals;
+
 module ieu (
-    input logic [31:0] rs1_data,
-    input logic [31:0] rs2_data,
+    input logic [XLEN-1:0] rs1_data,
+    input logic [XLEN-1:0] rs2_data,
     input execute_signals signals_in,
 
     output logic je,
-    output logic [31:0] ja,
-    output logic rs1_addr,
-    output logic rs2_addr,
+    output logic [XLEN-1:0] ja,
+    output logic [4:0] rs1_addr,
+    output logic [4:0] rs2_addr,
     output memory_signals signals_out
 );
+    import pipeline::*;
+
     logic [XLEN-1:0] operand_1, operand_2, alu_result;
 
     assign rs1_addr = signals_in.rs1_addr;
@@ -22,7 +27,7 @@ module ieu (
     assign signals_out.mm_re = signals_in.mm_re;
     assign signals_out.mm_we = signals_in.mm_we;
     assign signals_out.mm_addr = alu_result;
-    assign signals_out.data = jump?signals_in.inc_pc:alu_result;
+    assign signals_out.data = signals_in.jump?signals_in.inc_pc:alu_result;
     assign signals_out.rd_addr = signals_in.rd_addr;
     assign ja = alu_result;
 
@@ -34,7 +39,7 @@ module ieu (
         .operand_2,
 
         .result(alu_result)
-    )
+    );
 
     jbu jbu (
         .jump(signals_in.jump),
@@ -45,5 +50,5 @@ module ieu (
         .rs2_data,
 
         .je
-    )
+    );
 endmodule

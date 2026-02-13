@@ -1,6 +1,7 @@
-module ifu_shim #(
-    parameter XLEN = 32
-) (
+import pipeline::XLEN;
+import pipeline::decode_signals;
+
+module ifu_shim (
     input logic clk,
     input logic reset_n,
 
@@ -12,8 +13,6 @@ module ifu_shim #(
     output logic [XLEN-1:0] addr,
 
     input logic stall,
-    input logic jump,
-    input logic jack,
     input logic je,
     input logic [XLEN-1:0] ja,
 
@@ -22,7 +21,8 @@ module ifu_shim #(
     output logic [XLEN-1:0] inc_pc
 );
 
-    c2c_r #(.XLEN(XLEN)) instr_bus ();
+    c2c_r instr_bus ();
+    decode_signals signals_out_F;
 
     assign instr_bus.ack = ack;
     assign instr_bus.data = instr;
@@ -33,21 +33,20 @@ module ifu_shim #(
         addr <= instr_bus.addr;
     end
 
-    ifu #(
-        .XLEN(XLEN)
-    ) ifu (
+    assign instr_out = signals_out_F.instr;
+    assign curr_pc = signals_out_F.curr_pc;
+    assign inc_pc = signals_out_F.inc_pc;
+
+    ifu ifu (
         .clk,
         .reset_n,
-        
-        .instr_bus,
+
+        .instr_bus(instr_bus),
+
         .stall,
-        .jump,
-        .jack,
         .je,
         .ja,
 
-        .instr_out,
-        .curr_pc,
-        .inc_pc
+        .signals_out(signals_out_F)
     );
 endmodule

@@ -1,9 +1,8 @@
-module lsu_shim #(
-    parameter XLEN = 32
-) (
-    input logic clk,
-    input logic reset_n,
+import pipeline::XLEN;
+import pipeline::memory_signals;
+import pipeline::writeback_signals;
 
+module lsu_shim (
     // Data Bus Read Interface (c2c_r)
     input  logic             dr_ack,
     input  logic [XLEN-1:0]  dr_data,
@@ -22,17 +21,19 @@ module lsu_shim #(
     input logic mm_we,
     input logic mm_re,
     input logic [2:0] funct3,
-    input logic [XLEN-1:0] ieu_result,
-    input logic [XLEN-1:0] rs2_data,
+    input logic [XLEN-1:0] mm_addr,
+    input logic [XLEN-1:0] data_in,
+    input logic [4:0] rd_addr_in,
 
     // Outputs
-    output logic stall,
-    output logic [XLEN-1:0] data_out
+    output logic busy,
+    output logic [XLEN-1:0] data_out,
+    output logic [4:0] rd_addr_out
 );
 
     // Instantiate Interfaces
-    c2c_r #(.XLEN(XLEN)) data_bus_r ();
-    c2c_w #(.XLEN(XLEN)) data_bus_w ();
+    c2c_r data_bus_r ();
+    c2c_w data_bus_w ();
 
     // Map Read Interface
     assign data_bus_r.ack  = dr_ack;
@@ -48,20 +49,27 @@ module lsu_shim #(
     assign dw_addr         = data_bus_w.addr;
     assign dw_data         = data_bus_w.data;
 
-    lsu #(
-        .XLEN(XLEN)
-    ) lsu_inst (
-        .clk,
-        .reset_n,
+    memory_signals signals_in;
+    writeback_signals signals_out;
+
+    assign signals_in.funct3 = funct3;
+    assign signals_in.mm_re = mm_re;
+    assign signals_in.mm_we = mm_we;
+    assign signals_in.mm_addr = mm_addr;
+    assign signals_in.data = data_in;
+    assign signals_in.rd_addr = rd_addr_in;
+
+    assign data_out = signals_out.data;
+    assign rd_addr_out = signals_out.rd_addr;
+
+    lsu lsu_inst (
         .data_bus_r(data_bus_r.master),
         .data_bus_w(data_bus_w.master),
-        .mm_we,
-        .mm_re,
-        .funct3,
-        .ieu_result,
-        .rs2_data,
-        .stall,
-        .data(data_out)
+
+        .signals_in(signals_in),
+
+        .busy(busy),
+        .signals_out(signals_out)
     );
 
 endmodule

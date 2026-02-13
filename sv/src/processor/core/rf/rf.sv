@@ -1,4 +1,3 @@
-import pipeline::*;
 module rf (
     input logic clk,
     input logic [4:0] rs1_addr,
@@ -8,7 +7,7 @@ module rf (
     output logic [31:0] rs1_data,
     output logic [31:0] rs2_data
 );
-
+    import pipeline::*;
     logic [XLEN-1:0] ram [31:1];
 
     always_comb begin

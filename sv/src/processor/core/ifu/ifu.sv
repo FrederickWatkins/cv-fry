@@ -12,6 +12,7 @@ module ifu (
 
     output decode_signals signals_out
 );
+    import pipeline::*;
 
     logic stall_pc, compressed;
     logic [31:2] decomp_instr;
