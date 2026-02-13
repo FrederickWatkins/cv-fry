@@ -1,12 +1,13 @@
-<img width="250" height="194" alt="fry" src="https://github.com/user-attachments/assets/4f4d18f9-39be-4698-a477-4f445130b93f" />
-<img width="375" alt="Screenshot From 2026-02-10 17-25-25" src="https://github.com/user-attachments/assets/dfda52f0-72de-4fb7-9311-83f974e8a843" />
-<img width="375" alt="Screenshot From 2026-02-10 18-00-43" src="https://github.com/user-attachments/assets/f6884e1b-59f0-408f-be21-e10d3e8e321b" />
+<img width="500" alt="Screenshot From 2026-02-10 17-25-25" src="https://github.com/user-attachments/assets/dfda52f0-72de-4fb7-9311-83f974e8a843" />
+<img width="200" alt="fry" src="https://github.com/user-attachments/assets/4f4d18f9-39be-4698-a477-4f445130b93f" />
+
+<img width="1000" alt="Architectural diagram" src="https://github.com/user-attachments/assets/50419bc5-b138-4769-9f40-227ca02ee06c" />
 
 <img width="1000" alt="bee movie" src="https://github.com/user-attachments/assets/28ddf982-c860-43d2-9fbf-cd7282e7e649" />
 
 ## TODO list
 - Move code into separate crates in cargo workspace to allow incremental building of cpp ☑️ Done!
-- Pull registers out of modules and into generic pipeline regs
+- Pull registers out of modules and into generic pipeline regs ☑️ Done!
 - Add result forwarding
 - Add muldiv instructions
 - Separate muldiv into own unit with ready signal to allow variable length pipeline, add valid and ready signals to pipeline regs
