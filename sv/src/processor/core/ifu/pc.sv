@@ -1,7 +1,6 @@
+use pipeline::XLEN;
 // Program counter
-module pc #(
-    parameter XLEN = 32
-) (
+module (
     input logic clk,
     input logic reset_n,
 

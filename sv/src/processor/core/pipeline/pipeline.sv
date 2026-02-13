@@ -12,6 +12,7 @@ package pipeline;
         logic branch;
         logic op1_pc;
         logic op2_imm;
+        logic [2:0] alu_funct3;
         logic [2:0] funct3;
         logic [6:0] funct7;
         logic [XLEN-1:0] imm;
@@ -19,8 +20,6 @@ package pipeline;
         logic [XLEN-1:0] inc_pc;
         logic mm_re;
         logic mm_we;
-        logic [XLEN-1:0] data;
-        logic rd_we;
         logic [4:0] rd_addr;
     } execute_signals;
 
@@ -28,14 +27,13 @@ package pipeline;
         logic [2:0] funct3;
         logic mm_re;
         logic mm_we;
+        logic [XLEN-1:0] mm_addr;
         logic [XLEN-1:0] data;
-        logic rd_we;
         logic [4:0] rd_addr;
     } memory_signals;
 
     typedef struct packed {
         logic [XLEN-1:0] data;
-        logic rd_we;
         logic [4:0] rd_addr;
     } writeback_signals;
 endpackage
