@@ -1,7 +1,6 @@
+import pipeline::XLEN;
 // Arithmetic logic unit
-module alu #(
-    parameter XLEN = 32
-)(
+module alu (
     // Control
     input [2:0] funct3,
     input [6:0] funct7,

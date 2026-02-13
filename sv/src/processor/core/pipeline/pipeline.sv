@@ -20,6 +20,8 @@ package pipeline;
         logic [XLEN-1:0] inc_pc;
         logic mm_re;
         logic mm_we;
+        logic [4:0] rs1_addr;
+        logic [4:0] rs2_addr;
         logic [4:0] rd_addr;
     } execute_signals;
 

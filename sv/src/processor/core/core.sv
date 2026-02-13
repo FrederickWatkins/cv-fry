@@ -11,7 +11,7 @@ module core (
     import pipeline::*;
 
     logic stall_F, stall_D, stall_E, stall_M, stall_W;
-    logic flush_F, flush_D, flush_E, flush_M, flush_W;
+    logic flush_D, flush_E, flush_M, flush_W;
     logic je;
     logic [XLEN-1:0] ja;
     logic [4:0] rs1_addr, rs2_addr;
@@ -54,8 +54,6 @@ module core (
     idu idu (
         .signals_in(signals_in_D),
 
-        .rs1_addr,
-        .rs2_addr,
         .signals_out(signals_out_D)
     );
 
@@ -67,6 +65,8 @@ module core (
 
         .je,
         .ja,
+        .rs1_addr,
+        .rs2_addr,
         .signals_out(signals_out_E)
     );
 

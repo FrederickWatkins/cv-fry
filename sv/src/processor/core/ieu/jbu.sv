@@ -1,7 +1,6 @@
+import pipeline::XLEN;
 // Jump and branch unit
-module jbu #(
-    parameter XLEN = 32
-) (
+module jbu (
     input logic jump,
     input logic branch,
     input logic [2:0] funct3,
@@ -9,7 +8,6 @@ module jbu #(
     input logic [XLEN-1:0] rs1_data,
     input logic [XLEN-1:0] rs2_data,
 
-    output logic jack,
     output logic je
 );
     localparam BEQ = 3'b000;
@@ -20,10 +18,8 @@ module jbu #(
     localparam BGEU = 3'b111;
 
     always_comb begin
-        jack = 0;
         je = 0;
         if(branch) begin
-            jack = 1;
             case(funct3)
             BEQ: je = rs1_data == rs2_data;
             BNE: je = rs1_data != rs2_data;
@@ -35,7 +31,6 @@ module jbu #(
             endcase
         end
         if(jump) begin
-            jack = 1;
             je = 1;
         end
     end
