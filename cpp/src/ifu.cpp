@@ -15,10 +15,8 @@ extern "C"
     void vifu_set_clk(Vifu *dut, uint8_t val) { dut->clk = val; }
     void vifu_set_reset_n(Vifu *dut, uint8_t val) { dut->reset_n = val; }
     void vifu_set_stall(Vifu *dut, uint8_t val) { dut->stall = val; }
-    void vifu_set_jump(Vifu *dut, uint8_t val) { dut->jump = val; }
     void vifu_set_je(Vifu *dut, uint8_t val) { dut->je = val; }
     void vifu_set_ack(Vifu *dut, uint8_t val) { dut->ack = val; }
-    void vifu_set_jack(Vifu *dut, uint8_t val) { dut->jack = val; }
 
     // Port Setters (32-bit)
     void vifu_set_ja(Vifu *dut, uint32_t val) { dut->ja = val; }

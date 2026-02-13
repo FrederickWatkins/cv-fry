@@ -27,9 +27,14 @@ module ieu (
     assign signals_out.mm_re = signals_in.mm_re;
     assign signals_out.mm_we = signals_in.mm_we;
     assign signals_out.mm_addr = alu_result;
-    assign signals_out.data = signals_in.jump?signals_in.inc_pc:alu_result;
     assign signals_out.rd_addr = signals_in.rd_addr;
     assign ja = alu_result;
+
+    always_comb begin
+        if(signals_in.jump) signals_out.data = signals_in.inc_pc;
+        else if(signals_in.mm_we | signals_in.mm_re) signals_out.data = rs2_data;
+        else signals_out.data = alu_result;
+    end
 
     alu alu (
         .funct3(signals_in.alu_funct3),

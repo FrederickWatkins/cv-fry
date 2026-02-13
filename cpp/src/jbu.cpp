@@ -19,7 +19,6 @@ extern "C"
     void vjbu_set_rs2_data(Vjbu *dut, uint32_t val) { dut->rs2_data = val; }
 
     // Port Getters
-    uint8_t vjbu_get_jack(Vjbu *dut) { return dut->jack; }
     uint8_t vjbu_get_je(Vjbu *dut) { return dut->je; }
 
     // Tracing

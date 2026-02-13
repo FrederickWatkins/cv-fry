@@ -5,8 +5,6 @@ unsafe extern "C" {
     pub fn vifu_eval(dut: *mut std::ffi::c_void);
     pub fn vifu_set_clk(dut: *mut std::ffi::c_void, val: u8);
     pub fn vifu_set_stall(dut: *mut std::ffi::c_void, val: u8);
-    pub fn vifu_set_jump(dut: *mut std::ffi::c_void, val: u8);
-    pub fn vifu_set_jack(dut: *mut std::ffi::c_void, val: u8);
     pub fn vifu_set_je(dut: *mut std::ffi::c_void, val: u8);
     pub fn vifu_set_ja(dut: *mut std::ffi::c_void, val: u32);
     pub fn vifu_set_instr(dut: *mut std::ffi::c_void, val: u32);

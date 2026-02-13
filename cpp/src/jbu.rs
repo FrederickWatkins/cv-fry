@@ -11,6 +11,5 @@ unsafe extern "C" {
     pub fn vjbu_set_rs2_data(dut: *mut std::ffi::c_void, val: u32);
 
     // Getters
-    pub fn vjbu_get_jack(dut: *mut std::ffi::c_void) -> u8;
     pub fn vjbu_get_je(dut: *mut std::ffi::c_void) -> u8;
 }
