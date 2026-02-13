@@ -1,6 +1,6 @@
-use pipeline::XLEN;
+import pipeline::XLEN;
 // Program counter
-module (
+module pc (
     input logic clk,
     input logic reset_n,
 

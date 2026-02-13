@@ -12,7 +12,7 @@ module core (
 
     logic stall_F, stall_D, stall_E, stall_M, stall_W;
     logic flush_D, flush_E, flush_M, flush_W;
-    logic je;
+    logic je, busy_M;
     logic [XLEN-1:0] ja;
     logic [4:0] rs1_addr, rs2_addr;
     logic [XLEN-1:0] rs1_data, rs2_data;
@@ -24,13 +24,16 @@ module core (
 
     // Hazard controller
     hc hc (
-        .signals_F(signals_out_F),
-        .signals_D(signals_out_D),
-        .signals_E(signals_in_E),
-        .signals_M(signals_in_M),
-        .signals_W(signals_in_W),
+        .je,
+        .busy_M,
 
-        .stall_F, .flush_F,
+        .rs1_addr(signals_out_D.rs1_addr),
+        .rs2_addr(signals_out_D.rs2_addr),
+        .rd_E(signals_in_E.rd_addr),
+        .rd_M(signals_in_M.rd_addr),
+        .rd_W(signals_in_W.rd_addr),
+
+        .stall_F,
         .stall_D, .flush_D,
         .stall_E, .flush_E,
         .stall_M, .flush_M,
@@ -41,9 +44,10 @@ module core (
     ifu ifu (
         .clk,
         .reset_n,
-        .stall(stall_F),
-        .flush(flush_F),
+
         .instr_bus(instr_bus),
+
+        .stall(stall_F),
         .je,
         .ja,
 
@@ -72,14 +76,12 @@ module core (
 
     // Load store unit
     lsu lsu (
-        .clk,
-        .reset_n,
-
         .data_bus_r,
         .data_bus_w,
 
         .signals_in(signals_in_M),
 
+        .busy(busy_M),
         .signals_out(signals_out_M)
     );
 
@@ -111,7 +113,7 @@ module core (
     // Decode-exectue pipeline register
     pipeline_reg #(
         .T(execute_signals),
-        .NOP('{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        .NOP('{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
     ) pipeline_E (
         .clk,
         .reset_n,
@@ -137,7 +139,7 @@ module core (
     // Memory-writeback pipeline register
     pipeline_reg #(
         .T(writeback_signals),
-        .NOP('{0, 0, 0})
+        .NOP('{0, 0})
     ) pipeline_W (
         .clk,
         .reset_n,

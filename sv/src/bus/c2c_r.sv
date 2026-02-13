@@ -1,7 +1,6 @@
+import pipeline::XLEN;
 // Core to cache read interface
-interface c2c_r #(
-    parameter XLEN = 32
-);
+interface c2c_r;
     logic re, ack;
     logic [XLEN/8-1:0] sel;
     logic [XLEN-1:0] addr, data;

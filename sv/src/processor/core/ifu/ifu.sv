@@ -1,4 +1,4 @@
-import pipeline::*;
+import pipeline::decode_signals;
 // Instruction fetch unit
 module ifu (
     input logic clk,
@@ -12,6 +12,7 @@ module ifu (
 
     output decode_signals signals_out
 );
+
     logic stall_pc, compressed;
     logic [31:2] decomp_instr;
 
@@ -41,12 +42,12 @@ module ifu (
         .curr_pc(signals_out.curr_pc),
         .inc_pc(signals_out.inc_pc),
         .next_pc(instr_bus.addr)
-    )
+    );
 
     decomp decomp (
         .instr_in(instr_bus.data),
 
         .compressed,
         .instr_out(decomp_instr)
-    )
+    );
 endmodule
