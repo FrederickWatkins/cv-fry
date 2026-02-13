@@ -1,49 +1,18 @@
 use cv_fry_cpp::alu::*;
-use crate::utils::dut::DUT;
+use crate::utils::dut::DutComb;
 
 pub struct Alu {
     ptr: *mut std::ffi::c_void,
-    time: u64,
 }
 
 impl Alu {
-    pub fn new() -> Self {
-        Self { ptr: unsafe { valu_init() }, time: 0 }
-    }
-
-    pub fn set_funct3(&mut self, val: u8) {
-        unsafe {
-            valu_set_funct3(self.ptr, val);
-        }
-    }
-
-    pub fn set_funct7(&mut self, val: u8) {
-        unsafe {
-            valu_set_funct7(self.ptr, val);
-        }
-    }
-
-    pub fn set_op1(&mut self, val: u32) {
-        unsafe {
-            valu_set_operand_1(self.ptr, val);
-        }
-    }
-
-    pub fn set_op2(&mut self, val: u32) {
-        unsafe {
-            valu_set_operand_2(self.ptr, val);
-        }
-    }
-
-    pub fn eval(&mut self) {
-        unsafe {
-            valu_eval(self.ptr);
-        }
-    }
-
-    pub fn get_result(&self) -> u32 {
-        unsafe { valu_get_result(self.ptr) }
-    }
+    pub fn new() -> Self {Self { ptr: unsafe { valu_init() } }}
+    pub fn set_funct3(&mut self, val: u8) {unsafe {valu_set_funct3(self.ptr, val);}}
+    pub fn set_funct7(&mut self, val: u8) {unsafe {valu_set_funct7(self.ptr, val);}}
+    pub fn set_op1(&mut self, val: u32) {unsafe {valu_set_operand_1(self.ptr, val);}}
+    pub fn set_op2(&mut self, val: u32) {unsafe {valu_set_operand_2(self.ptr, val);}}
+    pub fn eval(&mut self) {unsafe {valu_eval(self.ptr);}}
+    pub fn get_result(&self) -> u32 {unsafe { valu_get_result(self.ptr) }}
 }
 
 impl Drop for Alu {
@@ -52,21 +21,9 @@ impl Drop for Alu {
     }
 }
 
-impl DUT for Alu {
-    fn set_clk(&mut self, _val: u8) {
-        // Module is purely comb, do nothing
-    }
-
+impl DutComb for Alu {
     fn eval(&mut self) {
         unsafe {valu_eval(self.ptr);}
-    }
-
-    fn timestep(&mut self) {
-        self.time += 5;
-    }
-    
-    fn reset(&mut self) {
-        // Module is purely comb, do nothing
     }
 }
 

@@ -12,4 +12,10 @@ unsafe extern "C" {
     pub fn vpc_get_curr_pc(dut: *mut std::ffi::c_void) -> u32;
     pub fn vpc_get_inc_pc(dut: *mut std::ffi::c_void) -> u32;
     pub fn vpc_get_next_pc(dut: *mut std::ffi::c_void) -> u32;
+    pub fn vpc_trace_init(
+        dut: *mut std::ffi::c_void,
+        filename: *const std::ffi::c_char,
+    ) -> *mut std::ffi::c_void;
+    pub fn vpc_trace_dump(vcd: *mut std::ffi::c_void, time: u64);
+    pub fn vpc_trace_close(vcd: *mut std::ffi::c_void);
 }

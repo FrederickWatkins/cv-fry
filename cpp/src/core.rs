@@ -24,4 +24,10 @@ unsafe extern "C" {
     pub fn vcore_get_dw_addr(dut: *mut std::ffi::c_void) -> u32;
     pub fn vcore_get_dw_data(dut: *mut std::ffi::c_void) -> u32;
     pub fn vcore_get_dw_sel(dut: *mut std::ffi::c_void) -> u8;
+    pub fn vcore_trace_init(
+        dut: *mut std::ffi::c_void,
+        filename: *const std::ffi::c_char,
+    ) -> *mut std::ffi::c_void;
+    pub fn vcore_trace_dump(vcd: *mut std::ffi::c_void, time: u64);
+    pub fn vcore_trace_close(vcd: *mut std::ffi::c_void);
 }

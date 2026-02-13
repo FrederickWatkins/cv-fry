@@ -53,6 +53,7 @@ fn main() {
             "--cc",
             "src/processor/core/pipeline/pipeline.sv",
             "--trace",
+            "--trace-structs",
             "-Isrc",
             "--prefix",
             prefix,

@@ -31,7 +31,6 @@ module core (
         .rs2_addr(signals_out_D.rs2_addr),
         .rd_E(signals_in_E.rd_addr),
         .rd_M(signals_in_M.rd_addr),
-        .rd_W(signals_in_W.rd_addr),
 
         .stall_F,
         .stall_D, .flush_D,

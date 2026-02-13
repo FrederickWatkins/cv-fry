@@ -2,7 +2,7 @@ use cv_fry_sim::core::Core;
 
 use cv_fry_sim::utils::c2c_r::C2cR;
 use cv_fry_sim::utils::c2c_w::C2cW;
-use cv_fry_sim::utils::dut::DUT;
+use cv_fry_sim::utils::dut::DutSync;
 
 use bracket_lib::prelude::*;
 
@@ -108,6 +108,7 @@ fn main() -> BError {
         .build()?;
 
     let mut core = Core::new();
+    core.trace_init("core.vcd");
     let binary = env!("PAYLOAD_CV-FRY-PAYLOAD-RS");
     let mut memory = std::fs::read(binary).unwrap();
     memory.resize(0x1000000, 0);

@@ -1,14 +1,15 @@
 use cv_fry_cpp::pc::*;
-use crate::utils::dut::DUT;
+use crate::utils::dut::{DutComb, DutSync};
 
 pub struct ProgramCounter {
     ptr: *mut std::ffi::c_void,
+    vcd: Option<*mut std::ffi::c_void>,
     time: u64,
 }
 
 impl ProgramCounter {
     pub fn new() -> Self {
-        Self { ptr: unsafe { vpc_init() }, time: 0 }
+        Self { ptr: unsafe { vpc_init() }, vcd: None, time: 0 }
     }
 
     pub fn set_stall(&mut self, val: u8) {
@@ -57,16 +58,19 @@ impl ProgramCounter {
 impl Drop for ProgramCounter {
     fn drop(&mut self) {
         unsafe { vpc_destroy(self.ptr) };
+        self.trace_close();
     }
 }
 
-impl DUT for ProgramCounter {
-    fn set_clk(&mut self, val: u8) {
-        unsafe {vpc_set_clk(self.ptr, val);}
-    }
-
+impl DutComb for ProgramCounter {
     fn eval(&mut self) {
         unsafe {vpc_eval(self.ptr);}
+    }
+}
+
+impl DutSync for ProgramCounter {
+    fn set_clk(&mut self, val: u8) {
+        unsafe {vpc_set_clk(self.ptr, val);}
     }
 
     fn timestep(&mut self) {
@@ -78,6 +82,22 @@ impl DUT for ProgramCounter {
             vpc_set_reset_n(self.ptr, 0); // Active low reset?
             self.tick();
             vpc_set_reset_n(self.ptr, 1);
+        }
+    }
+    
+    fn trace_init(&mut self, filename: &str) {
+        self.vcd = Some(unsafe {vpc_trace_init(self.ptr, std::ffi::CString::new(filename).unwrap().as_ptr())});
+    }
+    
+    fn trace_dump(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vpc_trace_dump(vcd, self.time);}
+        }
+    }
+    
+    fn trace_close(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vpc_trace_close(vcd);}
         }
     }
 }

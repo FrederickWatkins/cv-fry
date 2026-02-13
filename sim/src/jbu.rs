@@ -1,15 +1,14 @@
+use crate::utils::dut::DutComb;
 use cv_fry_cpp::jbu::*;
-use crate::utils::dut::DUT;
 
 pub struct Jbu {
     ptr: *mut std::ffi::c_void,
     pub time: u64,
 }
 
+#[rustfmt::skip]
 impl Jbu {
-    pub fn new() -> Self {
-        Self { ptr: unsafe { vjbu_init() }, time: 0 }
-    }
+    pub fn new() -> Self {Self { ptr: unsafe { vjbu_init() }, time: 0 }}
 
     pub fn set_jump(&mut self, val: u8) { unsafe { vjbu_set_jump(self.ptr, val); } }
     pub fn set_branch(&mut self, val: u8) { unsafe { vjbu_set_branch(self.ptr, val); } }
@@ -17,7 +16,6 @@ impl Jbu {
     pub fn set_rs1_data(&mut self, val: u32) { unsafe { vjbu_set_rs1_data(self.ptr, val); } }
     pub fn set_rs2_data(&mut self, val: u32) { unsafe { vjbu_set_rs2_data(self.ptr, val); } }
 
-    pub fn get_jack(&self) -> u8 { unsafe { vjbu_get_jack(self.ptr) } }
     pub fn get_je(&self) -> u8 { unsafe { vjbu_get_je(self.ptr) } }
 }
 
@@ -27,21 +25,11 @@ impl Drop for Jbu {
     }
 }
 
-impl DUT for Jbu {
-    fn set_clk(&mut self, _val: u8) {
-        // Module is purely comb, do nothing
-    }
-
+impl DutComb for Jbu {
     fn eval(&mut self) {
-        unsafe { vjbu_eval(self.ptr); }
-    }
-
-    fn timestep(&mut self) {
-        self.time += 5;
-    }
-
-    fn reset(&mut self) {
-        // Module is purely comb, do nothing
+        unsafe {
+            vjbu_eval(self.ptr);
+        }
     }
 }
 
@@ -61,7 +49,7 @@ mod tests {
         any::<u8>().prop_filter("3 bits", |x| *x < 8)
     }
 
-    proptest!{
+    proptest! {
         #[test]
         fn any_op(jump in any::<bool>(), branch in any::<bool>(), funct3 in funct3_strategy(), op1 in any::<i32>(), op2 in any::<i32>()) {
             let mut jbu = Jbu::new();
@@ -74,12 +62,6 @@ mod tests {
             jbu.set_rs1_data(op1 as u32);
             jbu.set_rs2_data(op2 as u32);
             jbu.eval();
-            if jump ^ branch {
-                prop_assert_eq!(jbu.get_jack(), 1);
-            }
-            if !jump & !branch {
-                prop_assert_eq!(jbu.get_jack(), 0);
-            }
             match (jump, branch, funct3) {
                 (true, true, _) => (),
                 (true, false, _) => prop_assert_eq!(jbu.get_je(), 1),

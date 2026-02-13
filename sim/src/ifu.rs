@@ -1,108 +1,55 @@
+use crate::utils::dut::{DutComb, DutSync};
 use cv_fry_cpp::ifu::*;
-use crate::utils::dut::DUT;
 
 pub struct Ifu {
     ptr: *mut std::ffi::c_void,
+    vcd: Option<*mut std::ffi::c_void>,
     time: u64,
 }
 
+#[rustfmt::skip]
 impl Ifu {
-    pub fn new() -> Self {
-        Self { ptr: unsafe { vifu_init() }, time: 0 }
-    }
-
-    pub fn set_stall(&mut self, val: u8) {
-        unsafe {
-            vifu_set_stall(self.ptr, val);
-        }
-    }
-
-    pub fn set_jump(&mut self, val: u8) {
-        unsafe {
-            vifu_set_jump(self.ptr, val);
-        }
-    }
-    
-    pub fn set_jack(&mut self, val: u8) {
-        unsafe {
-            vifu_set_jack(self.ptr, val);
-        }
-    }
-
-    pub fn set_ack(&mut self, val: u8) {
-        unsafe {
-            vifu_set_ack(self.ptr, val);
-        }
-    }
-
-    pub fn set_je(&mut self, val: u8) {
-        unsafe {
-            vifu_set_je(self.ptr, val);
-        }
-    }
-
-    pub fn set_ja(&mut self, val: u32) {
-        unsafe {
-            vifu_set_ja(self.ptr, val);
-        }
-    }
-
-    pub fn set_instr(&mut self, val: u32) {
-        unsafe {
-            vifu_set_instr(self.ptr, val);
-        }
-    }
-
-    pub fn eval(&mut self) {
-        unsafe {
-            vifu_eval(self.ptr);
-        }
-    }
-
-    pub fn get_re(&self) -> u8 {
-        unsafe { vifu_get_re(self.ptr) }
-    }
-
-    pub fn get_sel(&self) -> u8 {
-        unsafe { vifu_get_sel(self.ptr) }
-    }
-
-    pub fn get_curr_pc(&self) -> u32 {
-        unsafe { vifu_get_curr_pc(self.ptr) }
-    }
-
-    pub fn get_inc_pc(&self) -> u32 {
-        unsafe { vifu_get_inc_pc(self.ptr) }
-    }
-
-    pub fn get_addr(&self) -> u32 {
-        unsafe { vifu_get_addr(self.ptr) }
-    }
-
-    pub fn get_instr_out(&self) -> u32 {
-        unsafe { vifu_get_instr_out(self.ptr) }
-    }
+    pub fn new() -> Self {Self { ptr: unsafe { vifu_init() }, vcd: None, time: 0 }}
+    pub fn set_stall(&mut self, val: u8) {unsafe {vifu_set_stall(self.ptr, val);}}
+    pub fn set_ack(&mut self, val: u8) {unsafe {vifu_set_ack(self.ptr, val);}}
+    pub fn set_je(&mut self, val: u8) {unsafe {vifu_set_je(self.ptr, val);}}
+    pub fn set_ja(&mut self, val: u32) {unsafe {vifu_set_ja(self.ptr, val);}}
+    pub fn set_instr(&mut self, val: u32) {unsafe {vifu_set_instr(self.ptr, val);}}
+    pub fn eval(&mut self) {unsafe {vifu_eval(self.ptr);}}
+    pub fn get_re(&self) -> u8 {unsafe { vifu_get_re(self.ptr) }}
+    pub fn get_sel(&self) -> u8 {unsafe { vifu_get_sel(self.ptr) }}
+    pub fn get_curr_pc(&self) -> u32 {unsafe { vifu_get_curr_pc(self.ptr) }}
+    pub fn get_inc_pc(&self) -> u32 {unsafe { vifu_get_inc_pc(self.ptr) }}
+    pub fn get_addr(&self) -> u32 {unsafe { vifu_get_addr(self.ptr) }}
+    pub fn get_instr_out(&self) -> u32 {unsafe { vifu_get_instr_out(self.ptr) }}
 }
 
 impl Drop for Ifu {
     fn drop(&mut self) {
         unsafe { vifu_destroy(self.ptr) };
+        self.trace_close();
     }
 }
 
-impl DUT for Ifu {
-    fn set_clk(&mut self, val: u8) {
-        unsafe {vifu_set_clk(self.ptr, val);}
-    }
-
+impl DutComb for Ifu {
     fn eval(&mut self) {
-        unsafe {vifu_eval(self.ptr);}
+        unsafe {
+            vifu_eval(self.ptr);
+        }
+    }
+}
+
+impl DutSync for Ifu {
+    fn set_clk(&mut self, val: u8) {
+        unsafe {
+            vifu_set_clk(self.ptr, val);
+        }
     }
 
     fn timestep(&mut self) {
         self.time += 5;
     }
-    
+
     fn reset(&mut self) {
         unsafe {
             self.set_clk(0);
@@ -112,8 +59,23 @@ impl DUT for Ifu {
             vifu_set_reset_n(self.ptr, 1);
         }
     }
-}
 
+    fn trace_init(&mut self, filename: &str) {
+        self.vcd = Some(unsafe {vifu_trace_init(self.ptr, std::ffi::CString::new(filename).unwrap().as_ptr())});
+    }
+    
+    fn trace_dump(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vifu_trace_dump(vcd, self.time);}
+        }
+    }
+    
+    fn trace_close(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vifu_trace_close(vcd);}
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -124,22 +86,11 @@ mod tests {
     fn test_increments() {
         let mut ifu = Ifu::new();
         let memory: [u8; 64] = [
-            0x13, 0x00, 0x00, 0x00,
-            0x13, 0x00, 0x00, 0x01,
-            0x13, 0x00, 0x00, 0x02,
-            0x13, 0x00, 0x00, 0x03,
-            0x13, 0x00, 0x00, 0x04,
-            0x13, 0x00, 0x00, 0x05,
-            0x13, 0x00, 0x00, 0x06,
-            0x13, 0x00, 0x00, 0x07,
-            0x13, 0x00, 0x00, 0x08,
-            0x13, 0x00, 0x00, 0x09,
-            0x13, 0x00, 0x00, 0x0A,
-            0x13, 0x00, 0x00, 0x0B,
-            0x13, 0x00, 0x00, 0x0C,
-            0x13, 0x00, 0x00, 0x0D,
-            0x13, 0x00, 0x00, 0x0E,
-            0x13, 0x00, 0x00, 0x0F,
+            0x13, 0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x01, 0x13, 0x00, 0x00, 0x02, 0x13, 0x00,
+            0x00, 0x03, 0x13, 0x00, 0x00, 0x04, 0x13, 0x00, 0x00, 0x05, 0x13, 0x00, 0x00, 0x06,
+            0x13, 0x00, 0x00, 0x07, 0x13, 0x00, 0x00, 0x08, 0x13, 0x00, 0x00, 0x09, 0x13, 0x00,
+            0x00, 0x0A, 0x13, 0x00, 0x00, 0x0B, 0x13, 0x00, 0x00, 0x0C, 0x13, 0x00, 0x00, 0x0D,
+            0x13, 0x00, 0x00, 0x0E, 0x13, 0x00, 0x00, 0x0F,
         ];
         let mut ack = false;
         let mut instr;
@@ -151,47 +102,14 @@ mod tests {
                 assert_eq!(ifu.get_instr_out(), 0x00000004)
             }
             if ack {
-                assert_eq!(ifu.get_instr_out()>>22, (i - 1) / 4);
+                assert_eq!(ifu.get_instr_out() >> 22, (i - 1) / 4);
             }
-            (ack, instr) = instr_bus.respond(&memory, ifu.get_re()==1, ifu.get_sel(), ifu.get_addr());
+            (ack, instr) =
+                instr_bus.respond(&memory, ifu.get_re() == 1, ifu.get_sel(), ifu.get_addr());
             ifu.set_ack(ack as u8);
             ifu.set_instr(instr);
             assert_eq!(ifu.get_addr(), (i / 4) * 4);
             ifu.tick();
         }
-    }
-
-    #[test]
-    fn nackjack() {
-        let mut ifu = Ifu::new();
-        ifu.reset();
-        assert_eq!(ifu.get_curr_pc(), 0);
-        ifu.set_stall(0);
-        ifu.set_ack(0);
-        ifu.set_instr(0x13);
-        ifu.eval();
-        assert_eq!(ifu.get_addr(), 0);
-        ifu.set_jump(1);
-        ifu.tick();
-        ifu.set_jump(0);
-        ifu.tick();
-        assert_eq!(ifu.get_addr(), 0);
-        ifu.set_ack(1);
-        ifu.tick();
-        assert_eq!(ifu.get_addr(), 4);
-        ifu.set_instr(0xDEADBEEF);
-        ifu.set_jump(1);
-        ifu.eval();
-        assert_eq!(ifu.get_instr_out(), 0xDEADBEEF >> 2);
-        ifu.tick();
-        assert_eq!(ifu.get_instr_out(), 0x4);
-        ifu.set_jump(0);
-        ifu.tick();
-        ifu.tick();
-        ifu.tick();
-        assert_eq!(ifu.get_addr(), 4);
-        ifu.set_jack(1);
-        ifu.tick();
-        assert_eq!(ifu.get_addr(), 8);
     }
 }

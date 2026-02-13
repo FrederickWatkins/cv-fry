@@ -7,7 +7,6 @@ module hc (
     input logic [4:0] rs1_addr, input logic [4:0] rs2_addr,
     input logic [4:0] rd_E,
     input logic [4:0] rd_M,
-    input logic [4:0] rd_W,
 
     output logic stall_F,
     output logic stall_D, output logic flush_D,
@@ -48,8 +47,7 @@ module hc (
         // RAW hazard
         else if(
             ((rs1_addr == rd_E | rs2_addr == rd_E) && rd_E != 0) ||
-            ((rs1_addr == rd_M | rs2_addr == rd_M) && rd_M != 0) ||
-            ((rs1_addr == rd_W | rs2_addr == rd_W) && rd_W != 0) // TODO check if wb is RAW hazard or not
+            ((rs1_addr == rd_M | rs2_addr == rd_M) && rd_M != 0)
         ) begin
             stall_F = 1;
             stall_D = 1;

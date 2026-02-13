@@ -16,4 +16,10 @@ unsafe extern "C" {
     pub fn vifu_get_inc_pc(dut: *mut std::ffi::c_void) -> u32;
     pub fn vifu_get_addr(dut: *mut std::ffi::c_void) -> u32;
     pub fn vifu_get_instr_out(dut: *mut std::ffi::c_void) -> u32;
+    pub fn vifu_trace_init(
+        dut: *mut std::ffi::c_void,
+        filename: *const std::ffi::c_char,
+    ) -> *mut std::ffi::c_void;
+    pub fn vifu_trace_dump(vcd: *mut std::ffi::c_void, time: u64);
+    pub fn vifu_trace_close(vcd: *mut std::ffi::c_void);
 }

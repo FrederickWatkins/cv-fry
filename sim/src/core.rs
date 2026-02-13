@@ -1,14 +1,15 @@
 use cv_fry_cpp::core::*;
-use crate::utils::dut::DUT;
+use crate::utils::dut::{DutComb, DutSync};
 
 pub struct Core {
     ptr: *mut std::ffi::c_void,
+    vcd: Option<*mut std::ffi::c_void>,
     pub time: u64,
 }
 
 impl Core {
     pub fn new() -> Self {
-        Self { ptr: unsafe { vcore_init() }, time: 0 }
+        Self { ptr: unsafe { vcore_init() }, vcd: None, time: 0 }
     }
 
     // Bus Input Setters
@@ -29,21 +30,25 @@ impl Core {
     pub fn get_dw_addr(&self) -> u32 { unsafe { vcore_get_dw_addr(self.ptr) } }
     pub fn get_dw_data(&self) -> u32 { unsafe { vcore_get_dw_data(self.ptr) } }
     pub fn get_dw_sel(&self) -> u8 { unsafe { vcore_get_dw_sel(self.ptr) } }
+    
 }
 
 impl Drop for Core {
     fn drop(&mut self) {
         unsafe { vcore_destroy(self.ptr) };
+        self.trace_close();
     }
 }
 
-impl DUT for Core {
-    fn set_clk(&mut self, val: u8) {
-        unsafe { vcore_set_clk(self.ptr, val); }
-    }
-
+impl DutComb for Core {
     fn eval(&mut self) {
         unsafe { vcore_eval(self.ptr); }
+    }
+}
+
+impl DutSync for Core {
+    fn set_clk(&mut self, val: u8) {
+        unsafe { vcore_set_clk(self.ptr, val); }
     }
 
     fn timestep(&mut self) {
@@ -58,6 +63,22 @@ impl DUT for Core {
             self.tick();
             vcore_set_reset_n(self.ptr, 1);
             self.eval();
+        }
+    }
+
+    fn trace_init(&mut self, filename: &str) {
+        self.vcd = Some(unsafe {vcore_trace_init(self.ptr, std::ffi::CString::new(filename).unwrap().as_ptr())});
+    }
+    
+    fn trace_dump(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vcore_trace_dump(vcd, self.time);}
+        }
+    }
+    
+    fn trace_close(&mut self) {
+        if let Some(vcd) = self.vcd {
+            unsafe {vcore_trace_close(vcd);}
         }
     }
 }

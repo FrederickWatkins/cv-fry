@@ -1,7 +1,7 @@
 use cv_fry_sim::core::Core;
 use cv_fry_sim::utils::c2c_r::C2cR;
 use cv_fry_sim::utils::c2c_w::C2cW;
-use cv_fry_sim::utils::dut::DUT;
+use cv_fry_sim::utils::dut::DutSync;
 
 fn main() {
     let mut core = Core::new();
