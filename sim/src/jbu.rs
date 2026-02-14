@@ -46,7 +46,7 @@ mod tests {
     const BGEU: u8 = 0b111;
 
     fn funct3_strategy() -> impl Strategy<Value = u8> {
-        any::<u8>().prop_filter("3 bits", |x| *x < 8)
+        any::<u8>().prop_map(|x| x >> 5)
     }
 
     proptest! {

@@ -1,4 +1,4 @@
 [toolchain]
 channel = "nightly"
-targets = ["riscv32i-unknown-none-elf"]
+targets = ["riscv32im-unknown-none-elf"]
 components = ["rust-src"] # Required for build-std

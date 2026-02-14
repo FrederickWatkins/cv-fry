@@ -5,3 +5,7 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 9afd603d197318a133d55f70c31b84ab9dd96de1aa36f993af6208bed596fc6e # shrinks to funct3 = 0, funct7 = 0, op1 = 0, op2 = -1
+cc fcfedfb51fa9146d5aa3c1d18203dc97b5034f9305e97fe4527e78940fcd4abf # shrinks to funct3 = 0, funct7 = 1, op1 = 0, op2 = 1
+cc 050902cb96e320226843b041d8e399e772183dcd7bc8b9cec96ac98c6f74a474 # shrinks to funct3 = 2, funct7 = 1, op1 = 1, op2 = -1
+cc dd9416c4c67579bbeda59c820669eb8e401d6d81b7d686aa1cd8c939acd74b09 # shrinks to funct3 = 3, funct7 = 1, op1 = -1, op2 = 1
+cc 1e48febcc8555e4d1519c19ccf007a907f52035a3474bcff0da0e346b7c4ebb5 # shrinks to funct3 = 3, funct7 = 1, op1 = -1, op2 = -1

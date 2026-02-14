@@ -47,12 +47,23 @@ mod tests {
     const SUB: u8 = 0b000;
     const SRA: u8 = 0b101;
 
+    // Funct3 values where funct7 = b0000001
+    const MULDIV: u8 = 0b0000001;
+    const MUL: u8 = 0b000;
+    const MULH: u8 = 0b001; // Signed
+    const MULHSU: u8 = 0b010; // Signed*unsigned
+    const MULHU: u8 = 0b011; // Unsigned*unsigned
+    const DIV: u8 = 0b100;
+    const DIVU: u8 = 0b101;
+    const REM: u8 = 0b110;
+    const REMU: u8 = 0b111;
+
     fn funct3_strategy() -> impl Strategy<Value = u8> {
-        any::<u8>().prop_filter("3 bits", |x| *x < 8)
+        any::<u8>().prop_map(|x| x >> 5)
     }
 
     fn funct7_strategy() -> impl Strategy<Value = u8> {
-        any::<bool>().prop_map(|x| if x {BASEOP} else {ALTOP})
+        any::<u8>().prop_map(|x| match x % 3 {0 => BASEOP, 1 => ALTOP, 2 => MULDIV, _ => 0})
     }
 
     proptest!{
@@ -64,10 +75,16 @@ mod tests {
             alu.set_op1(op1 as u32);
             alu.set_op2(op2 as u32);
             alu.eval();
+            if funct7 == MULDIV && [DIV, DIVU, REM, REMU].contains(&funct3) && op2 == 0 {
+                return Ok(());
+            }
+            if funct7 == MULDIV && [DIV, REM].contains(&funct3) && op1 == i32::MIN && op2 == -1 {
+                return Ok(());
+            }
             match (funct7, funct3) {
                 (BASEOP, ADD) => prop_assert_eq!(alu.get_result() as i32, op1.overflowing_add(op2).0),
                 (BASEOP, SL) => prop_assert_eq!(alu.get_result() as i32, op1 << (op2 & 0x1F)),
-                (BASEOP, SLT) => prop_assert_eq!(alu.get_result() , if op1 < op2 {1} else {0}),
+                (BASEOP, SLT) => prop_assert_eq!(alu.get_result(), if op1 < op2 {1} else {0}),
                 (BASEOP, SLTU) => prop_assert_eq!(alu.get_result(), if (op1 as u32) < (op2 as u32) {1} else {0}),
                 (BASEOP, XOR) => prop_assert_eq!(alu.get_result() as i32, op1 ^ op2),
                 (BASEOP, SRL) => prop_assert_eq!(alu.get_result(), (op1 as u32) >> (op2 & 0x1F)),
@@ -75,8 +92,90 @@ mod tests {
                 (BASEOP, AND) => prop_assert_eq!(alu.get_result() as i32, op1 & op2),
                 (ALTOP, SUB) => prop_assert_eq!(alu.get_result() as i32, op1.overflowing_sub(op2).0),
                 (ALTOP, SRA) => prop_assert_eq!(alu.get_result() as i32, op1 >> (op2 & 0x1F)),
+                (MULDIV, MUL) => prop_assert_eq!(alu.get_result() as i32, op1.overflowing_mul(op2).0),
+                (MULDIV, MULH) => prop_assert_eq!(alu.get_result() as i32, ((op1 as i64).overflowing_mul(op2 as i64).0 >> 32) as i32),
+                (MULDIV, MULHSU) => prop_assert_eq!(alu.get_result(), ((op1 as u64).overflowing_mul(op2 as u32 as u64).0 >> 32) as u32),
+                (MULDIV, MULHU) => prop_assert_eq!(alu.get_result(), ((op1 as u32 as u64).overflowing_mul(op2 as u32 as u64).0 >> 32) as u32),
+                (MULDIV, DIV) => prop_assert_eq!(alu.get_result() as i32, if op2 == 0 {-1} else {op1.overflowing_div(op2).0}),
+                (MULDIV, DIVU) => prop_assert_eq!(alu.get_result(), if op2 == 0 {u32::MAX} else {(op1 as u32).overflowing_div(op2 as u32).0}),
+                (MULDIV, REM) => prop_assert_eq!(alu.get_result() as i32, if op2 == 0 {op1} else {op1.overflowing_rem(op2).0}),
+                (MULDIV, REMU) => prop_assert_eq!(alu.get_result(), if op2 == 0 {op1 as u32} else {(op1 as u32).overflowing_rem(op2 as u32).0}),
                 _ => (),
             }
         }
+    }
+
+    proptest!{
+        #[test]
+        fn div_zero(op1 in any::<i32>()) {
+            let mut alu = Alu::new();
+            alu.set_funct3(DIV);
+            alu.set_funct7(MULDIV);
+            alu.set_op1(op1 as u32);
+            alu.set_op2(0);
+            alu.eval();
+            prop_assert_eq!(alu.get_result() as i32, -1);
+        }
+    }
+
+    proptest!{
+        #[test]
+        fn divu_zero(op1 in any::<u32>()) {
+            let mut alu = Alu::new();
+            alu.set_funct3(DIVU);
+            alu.set_funct7(MULDIV);
+            alu.set_op1(op1);
+            alu.set_op2(0);
+            alu.eval();
+            prop_assert_eq!(alu.get_result(), u32::MAX);
+        }
+    }
+
+    proptest!{
+        #[test]
+        fn rem_zero(op1 in any::<i32>()) {
+            let mut alu = Alu::new();
+            alu.set_funct3(REM);
+            alu.set_funct7(MULDIV);
+            alu.set_op1(op1 as u32);
+            alu.set_op2(0);
+            alu.eval();
+            prop_assert_eq!(alu.get_result() as i32, op1);
+        }
+    }
+
+    proptest!{
+        #[test]
+        fn remu_zero(op1 in any::<u32>()) {
+            let mut alu = Alu::new();
+            alu.set_funct3(REMU);
+            alu.set_funct7(MULDIV);
+            alu.set_op1(op1);
+            alu.set_op2(0);
+            alu.eval();
+            prop_assert_eq!(alu.get_result(), op1);
+        }
+    }
+
+    #[test]
+    fn div_overflow() {
+        let mut alu = Alu::new();
+        alu.set_funct3(DIV);
+        alu.set_funct7(MULDIV);
+        alu.set_op1(i32::MIN as u32);
+        alu.set_op2((-1 as i32) as u32);
+        alu.eval();
+        assert_eq!(alu.get_result() as i32, i32::MIN);
+    }
+
+    #[test]
+    fn rem_overflow() {
+        let mut alu = Alu::new();
+        alu.set_funct3(REM);
+        alu.set_funct7(MULDIV);
+        alu.set_op1(i32::MIN as u32);
+        alu.set_op2((-1 as i32) as u32);
+        alu.eval();
+        assert_eq!(alu.get_result() as i32, 0);
     }
 }

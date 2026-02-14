@@ -27,6 +27,17 @@ module alu (
     localparam SUB = 3'b000;
     localparam SRA = 3'b101;
 
+    // Funct3 values where funct7 = b0000001
+    localparam MULDIV = 7'b0000001;
+    localparam MUL = 3'b000;
+    localparam MULH = 3'b001; // Signed
+    localparam MULHSU = 3'b010; // Signed*unsigned
+    localparam MULHU = 3'b011; // Unsigned*unsigned
+    localparam DIV = 3'b100;
+    localparam DIVU = 3'b101;
+    localparam REM = 3'b110;
+    localparam REMU = 3'b111;
+
     localparam shamt_len = XLEN == 32 ? 5 : 6;
 
     always_comb begin
@@ -41,6 +52,28 @@ module alu (
         {BASEOP, AND}: result = operand_1 & operand_2;
         {ALTOP, SUB}: result = operand_1 - operand_2;
         {ALTOP, SRA}: result = $unsigned($signed(operand_1)>>>operand_2[shamt_len-1:0]);
+        {MULDIV, MUL}: result = operand_1 * operand_2;
+        {MULDIV, MULH}: result[31:0] = XLEN'({{(XLEN){operand_1[31]}}, operand_1} * {{(XLEN){operand_2[31]}}, operand_2} >> 32);
+        {MULDIV, MULHU}: result[31:0] = XLEN'({{(XLEN){1'b0}}, operand_1} * {{(XLEN){1'b0}}, operand_2} >> 32);
+        {MULDIV, MULHSU}: result[31:0] = XLEN'({{(XLEN){operand_1[31]}}, operand_1} * {{(XLEN){1'b0}}, operand_2} >> 32);
+        {MULDIV, DIV}: begin
+            if(operand_2 == 0) result = 'hFFFF_FFFF;
+            else if(operand_1 == 'h8000_0000 && operand_2 == 'hFFFF_FFFF) result = 'h8000_0000;
+            else result = $signed(operand_1) / $signed(operand_2);
+        end
+        {MULDIV, DIVU}: begin
+            if(operand_2 == 0) result = 'hFFFF_FFFF;
+            else result = operand_1 / operand_2;
+        end
+        {MULDIV, REM}: begin
+            if(operand_2 == 0) result = operand_1;
+            else if(operand_1 == 'h8000_0000 && operand_2 == 'hFFFF_FFFF) result = 0;
+            else result = $signed(operand_1) % $signed(operand_2);
+        end
+        {MULDIV, REMU}: begin
+            if(operand_2 == 0) result = operand_1;
+            else result = operand_1 % operand_2;
+        end
         default: result = 'x;
         endcase
     end
