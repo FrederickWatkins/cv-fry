@@ -9,7 +9,7 @@
 - Move code into separate crates in cargo workspace to allow incremental building of cpp ☑️ Done!
 - Pull registers out of modules and into generic pipeline regs ☑️ Done!
 - Add result forwarding
-- Add muldiv instructions
+- Add muldiv instructions ☑️ Done!
 - Separate muldiv into own unit with ready signal to allow variable length pipeline, add valid and ready signals to pipeline regs
 
 ## Questions
