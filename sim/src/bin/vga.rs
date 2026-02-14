@@ -116,6 +116,6 @@ fn main() -> BError {
     let data_bus_r = C2cR::new(0);
     let data_bus_w = C2cW::new(0);
     core.reset();
-    let gs = State { memory, core, instr_bus, data_bus_r, data_bus_w, cycles_per_refresh: 5000 };
+    let gs = State { memory, core, instr_bus, data_bus_r, data_bus_w, cycles_per_refresh: 10000 };
     main_loop(context, gs)
 }

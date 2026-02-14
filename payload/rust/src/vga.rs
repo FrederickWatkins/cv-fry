@@ -1,5 +1,6 @@
 use core::fmt::Write;
 use core::arch::asm;
+use core::panic::PanicInfo;
 
 #[derive(Clone, Copy)]
 pub enum Colour {
@@ -72,7 +73,7 @@ impl Buffer {
             self.x += 1;
         }
         self.slice[self.x + self.y * self.width] = (self.cursor_colour as u16) << 12;
-        for _ in 0..10 {
+        for _ in 0..300 {
             unsafe {
                 asm!(
                     // Assembly instructions go here
@@ -91,6 +92,16 @@ impl Buffer {
                 }
             }
         }
+    }
+
+    pub fn clear(&mut self) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                self.slice[x + y * self.width] = 0;
+            }
+        }
+        self.x = 0;
+        self.y = 0;
     }
 }
 
@@ -114,9 +125,11 @@ macro_rules! println {
     ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }
 
+
+static mut BUFFER: Option<Buffer> = None;
+
 pub fn _print(args: core::fmt::Arguments) {
     use core::fmt::Write;
-    static mut BUFFER: Option<Buffer> = None;
     unsafe {
         if (&raw mut BUFFER).as_mut().unwrap().as_mut().is_none() {
             BUFFER = Some(Buffer::new(80, 25, 0xb8000, Colour::Green, Colour::Black, Colour::Cyan))
@@ -129,4 +142,18 @@ pub fn _print(args: core::fmt::Arguments) {
             .write_fmt(args)
             .unwrap();
     }
+}
+
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    unsafe{(&raw mut BUFFER)
+            .as_mut()
+            .unwrap()
+            .as_mut()
+            .unwrap().clear();}
+    print!("panic! {}", info.message());
+    if let Some(location) = info.location() {
+        println!(" @ {location}");
+    }
+    loop {}
 }
