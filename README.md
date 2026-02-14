@@ -10,6 +10,13 @@
 - Pull registers out of modules and into generic pipeline regs ☑️ Done!
 - Add operand forwarding ☑️ Done! 832 cycles to 551 to execute stress test!!
 - Add muldiv instructions ☑️ Done!
+- Add C instructions
+- Port to 64 bit
+- Add Zcsr (and Zfencei, but it's nop for now)
+- Add interrupts (big one) and wire up invalid instructions to exceptions instead of doing nothing
+- Add F (write own fpu for the sake of it)
+- Add D (just porting the fpu)
+- Add A (god save us)
 
 ## Questions
 - Q: Is that your processor printing the entire script of the bee movie to a memory mapped vga buffer? A: Yes.
