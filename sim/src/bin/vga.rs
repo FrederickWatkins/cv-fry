@@ -1,15 +1,46 @@
 use cv_fry_sim::core::Core;
-
 use cv_fry_sim::utils::c2c_r::C2cR;
 use cv_fry_sim::utils::c2c_w::C2cW;
 use cv_fry_sim::utils::dut::DutSync;
 
-use bracket_lib::prelude::*;
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::{Texture, TextureCreator};
+use sdl2::video::WindowContext;
+use std::time::Duration;
+use sdl2::hint;
 
-const WIDTH: usize = 80;
-const HEIGHT: usize = 25;
+// VGA Constants
+const COLS: usize = 80;
+const ROWS: usize = 25;
+const CHAR_WIDTH: u32 = 8;
+const CHAR_HEIGHT: u32 = 16;
+const SCREEN_WIDTH: u32 = COLS as u32 * CHAR_WIDTH;
+const SCREEN_HEIGHT: u32 = ROWS as u32 * CHAR_HEIGHT;
 
-struct State {
+// VGA Palette (Standard 16 colors)
+const PALETTE: [Color; 16] = [
+    Color::RGB(0, 0, 0),       // 0: Black
+    Color::RGB(0, 0, 170),     // 1: Blue
+    Color::RGB(0, 170, 0),     // 2: Green
+    Color::RGB(0, 170, 170),   // 3: Cyan
+    Color::RGB(170, 0, 0),     // 4: Red
+    Color::RGB(170, 0, 170),   // 5: Magenta
+    Color::RGB(170, 85, 0),    // 6: Brown
+    Color::RGB(170, 170, 170), // 7: Light Gray
+    Color::RGB(85, 85, 85),    // 8: Dark Gray
+    Color::RGB(85, 85, 255),   // 9: Light Blue
+    Color::RGB(85, 255, 85),   // 10: Light Green
+    Color::RGB(85, 255, 255),  // 11: Light Cyan
+    Color::RGB(255, 85, 85),   // 12: Light Red
+    Color::RGB(255, 85, 255),  // 13: Light Magenta
+    Color::RGB(255, 255, 85),  // 14: Yellow
+    Color::RGB(255, 255, 255), // 15: White
+];
+
+struct EmulatorState {
     memory: Vec<u8>,
     core: Core,
     instr_bus: C2cR,
@@ -18,10 +49,29 @@ struct State {
     cycles_per_refresh: usize,
 }
 
-impl GameState for State {
-    fn tick(&mut self, ctx: &mut BTerm) {
-        ctx.cls(); // Clear the screen
+impl EmulatorState {
+    fn new(binary: &[u8]) -> Self {
+        let mut core = Core::new();
+        core.trace_init("core.vcd");
+        
+        let mut memory = binary.to_vec();
+        memory.resize(0x1000000, 0); // 16MB memory
+        
+        core.reset();
+
+        Self {
+            memory,
+            core,
+            instr_bus: C2cR::new(0),
+            data_bus_r: C2cR::new(0),
+            data_bus_w: C2cW::new(0),
+            cycles_per_refresh: 2000,
+        }
+    }
+
+    fn run_cycles(&mut self) {
         for _ in 0..self.cycles_per_refresh {
+            // Instruction Bus
             let (instr_ack, instr) = self.instr_bus.respond(
                 &self.memory,
                 self.core.get_instr_re() == 1,
@@ -30,6 +80,8 @@ impl GameState for State {
             );
             self.core.set_instr_ack(instr_ack as u8);
             self.core.set_instr_data(instr);
+
+            // Data Read Bus
             let (data_r_ack, data_r) = self.data_bus_r.respond(
                 &self.memory,
                 self.core.get_dr_re() == 1,
@@ -38,6 +90,8 @@ impl GameState for State {
             );
             self.core.set_dr_ack(data_r_ack as u8);
             self.core.set_dr_data(data_r);
+
+            // Data Write Bus
             let data_w_ack = self.data_bus_w.respond(
                 &mut self.memory,
                 self.core.get_dw_we() == 1,
@@ -46,76 +100,122 @@ impl GameState for State {
                 self.core.get_dw_data(),
             );
             self.core.set_dw_ack(data_w_ack as u8);
+
+            // Tick Core
             self.core.tick();
         }
-        
-        // 1. Render the buffer
-        for (i, chunk) in self.memory[0xb8000..0xb8000 + WIDTH * HEIGHT * 2].chunks(2).enumerate() {
-            let x = (i % WIDTH) as i32;
-            let y = (i / WIDTH) as i32;
+    }
+}
 
-            let glyph = chunk[0];
-            let attr = chunk[1];
+fn main() -> Result<(), String> {
+    // 1. Initialize SDL2
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
 
-            // Extract foreground (low 4 bits) and background (high 4 bits)
-            let fg_idx = attr & 0x0F;
-            let bg_idx = (attr & 0xF0) >> 4;
+    hint::set("SDL_RENDER_SCALE_QUALITY", "0");
 
-            // Map palette indices to actual RGB colors
-            let fg = u8_to_cp437_color(fg_idx);
-            let bg = u8_to_cp437_color(bg_idx);
+    let window = video_subsystem
+        .window("VGA Text Mode Emulator", SCREEN_WIDTH*2, SCREEN_HEIGHT*2)
+        .position_centered()
+        .build()
+        .map_err(|e| e.to_string())?;
 
-            ctx.set(x, y, fg, bg, glyph);
-        }
+    let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+    canvas.set_logical_size(SCREEN_WIDTH, SCREEN_HEIGHT).unwrap();
+    let texture_creator: TextureCreator<WindowContext> = canvas.texture_creator();
 
-        // 2. Handle Keypresses
-        if let Some(key) = ctx.key {
-            match key {
-                VirtualKeyCode::Escape => ctx.quit(),
-                VirtualKeyCode::A => println!("The 'A' key was pressed!"),
+    // 2. Load VGA Font
+    // We expect a 16x16 grid image. 
+    // We use load_surface so we can set the Color Key (transparency) before creating a texture.
+    use sdl2::image::LoadSurface;
+    let mut font_surface = sdl2::surface::Surface::from_file("vga8x16.png")
+        .map_err(|e| format!("Failed to load font: {}", e))?;
+
+    // Set Black (0,0,0) as transparent color key
+    font_surface.set_color_key(true, Color::RGB(255, 0, 255))?;
+    
+    let mut font_texture = texture_creator
+        .create_texture_from_surface(&font_surface)
+        .map_err(|e| e.to_string())?;
+
+    // 3. Initialize Emulator State
+    let binary = env!("PAYLOAD_CV-FRY-PAYLOAD-RS");
+    let binary_data = std::fs::read(binary).map_err(|_| "Failed to read binary payload")?;
+    let mut state = EmulatorState::new(&binary_data);
+
+    // 4. Main Loop
+    let mut event_pump = sdl_context.event_pump()?;
+    
+    'running: loop {
+        // --- Input Handling ---
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
+                Event::KeyDown { keycode: Some(Keycode::A), .. } => {
+                     println!("The 'A' key was pressed!");
+                }
                 _ => {}
             }
         }
+
+        // --- Simulation ---
+        state.run_cycles();
+
+        // --- Rendering ---
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.clear();
+
+        // Iterate over VGA buffer at 0xB8000
+        // Buffer format: [Character, Attribute] repeated
+        let vga_buffer = &state.memory[0xb8000..0xb8000 + (COLS * ROWS * 2)];
+
+        for (i, chunk) in vga_buffer.chunks(2).enumerate() {
+            let glyph_idx = chunk[0];
+            let attr = chunk[1];
+
+            // Decode Colors
+            let fg_idx = attr & 0x0F;
+            let bg_idx = (attr & 0xF0) >> 4;
+            let fg_color = PALETTE[fg_idx as usize];
+            let bg_color = PALETTE[bg_idx as usize];
+
+            // Calculate Grid Position
+            let col = (i % COLS) as i32;
+            let row = (i / COLS) as i32;
+            let x = col * CHAR_WIDTH as i32;
+            let y = row * CHAR_HEIGHT as i32;
+
+            let dest_rect = Rect::new(x, y, CHAR_WIDTH, CHAR_HEIGHT);
+
+            // 1. Draw Background
+            canvas.set_draw_color(bg_color);
+            canvas.fill_rect(dest_rect)?;
+
+            // 2. Draw Glyph (Foreground)
+            // Calculate source rect in font sheet (assuming 16 columns of chars)
+            let src_col = (glyph_idx % 16) as i32;
+            let src_row = (glyph_idx / 16) as i32;
+            let src_rect = Rect::new(
+                src_col * CHAR_WIDTH as i32, 
+                src_row * CHAR_HEIGHT as i32, 
+                CHAR_WIDTH, 
+                CHAR_HEIGHT
+            );
+
+            // Tint the texture with the foreground color
+            font_texture.set_color_mod(fg_color.r, fg_color.g, fg_color.b);
+            canvas.copy(&font_texture, src_rect, dest_rect)?;
+        }
+
+        canvas.present();
+        
+        // Cap framerate roughly (~60 FPS) to prevent 100% CPU usage on the render thread
+        std::thread::sleep(Duration::from_millis(16));
     }
-}
 
-// Helper to map 4-bit VGA palette to bracket-lib colors
-fn u8_to_cp437_color(idx: u8) -> RGB {
-    match idx {
-        0 => RGB::from_u8(0, 0, 0),       // Black
-        1 => RGB::from_u8(0, 0, 170),     // Blue
-        2 => RGB::from_u8(0, 170, 0),     // Green
-        3 => RGB::from_u8(0, 170, 170),   // Cyan
-        4 => RGB::from_u8(170, 0, 0),     // Red
-        5 => RGB::from_u8(170, 0, 170),   // Magenta
-        6 => RGB::from_u8(170, 85, 0),    // Brown
-        7 => RGB::from_u8(170, 170, 170), // Light Gray
-        // ... indices 8-15 (Bright colors)
-        15 => RGB::from_u8(255, 255, 255), // White
-        _ => RGB::from_u8(85, 85, 85),     // Default Gray
-    }
-}
-
-fn main() -> BError {
-    unsafe {std::env::set_var("WINIT_UNIX_BACKEND", "x11");}
-    let context = BTermBuilder::new()
-        .with_title("VGA Text Mode Emulator")
-        .with_dimensions(WIDTH, HEIGHT)
-        .with_tile_dimensions(16, 32)
-        .with_font("vga8x16.png", 8, 16) // This filename is internal to the crate
-        .with_simple_console(WIDTH, HEIGHT, "vga8x16.png")
-        .with_advanced_input(true)
-        .build()?;
-
-    let mut core = Core::new();
-    core.trace_init("core.vcd");
-    let binary = env!("PAYLOAD_CV-FRY-PAYLOAD-RS");
-    let mut memory = std::fs::read(binary).unwrap();
-    memory.resize(0x1000000, 0);
-    let instr_bus = C2cR::new(0);
-    let data_bus_r = C2cR::new(0);
-    let data_bus_w = C2cW::new(0);
-    core.reset();
-    let gs = State { memory, core, instr_bus, data_bus_r, data_bus_w, cycles_per_refresh: 10000 };
-    main_loop(context, gs)
+    Ok(())
 }

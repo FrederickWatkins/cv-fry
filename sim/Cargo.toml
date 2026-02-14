@@ -5,9 +5,9 @@ edition = "2024"
 build = "build.rs"
 
 [dependencies]
-bracket-lib = "0.8.7"
 cv-fry-cpp = { path = "../cpp" }
 cv-fry-payload = { path = "../payload"}
+sdl2 = { version = "0.38.0", features = ["image"] }
 
 
 [dev-dependencies]
