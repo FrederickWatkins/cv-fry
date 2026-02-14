@@ -1,4 +1,5 @@
 import pipeline::decode_signals;
+import pipeline::XLEN;
 // Instruction fetch unit
 module ifu (
     input logic clk,
@@ -8,7 +9,7 @@ module ifu (
 
     input logic stall,
     input logic je,
-    input logic [31:0] ja,
+    input logic [XLEN-1:0] ja,
 
     output decode_signals signals_out
 );
