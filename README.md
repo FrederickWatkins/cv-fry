@@ -8,9 +8,8 @@
 ## TODO list
 - Move code into separate crates in cargo workspace to allow incremental building of cpp ☑️ Done!
 - Pull registers out of modules and into generic pipeline regs ☑️ Done!
-- Add result forwarding
+- Add operand forwarding ☑️ Done! 832 cycles to 551 to execute stress test!!
 - Add muldiv instructions ☑️ Done!
-- Separate muldiv into own unit with ready signal to allow variable length pipeline, add valid and ready signals to pipeline regs
 
 ## Questions
 - Q: Is that your processor printing the entire script of the bee movie to a memory mapped vga buffer? A: Yes.

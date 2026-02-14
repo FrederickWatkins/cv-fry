@@ -37,6 +37,7 @@ fn main() {
                 "src/processor/core",
                 "src/bus",
                 "src/processor/core/hc",
+                "src/processor/core/forward",
                 "src/processor/core/idu",
                 "src/processor/core/ieu",
                 "src/processor/core/ifu",

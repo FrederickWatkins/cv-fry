@@ -15,7 +15,7 @@ module core (
     logic je, busy_M;
     logic [XLEN-1:0] ja;
     logic [4:0] rs1_addr, rs2_addr;
-    logic [XLEN-1:0] rs1_data, rs2_data;
+    logic [XLEN-1:0] rs1_data, rs2_data, rs1_data_rf, rs2_data_rf;
     
     decode_signals signals_out_F, signals_in_D;
     execute_signals signals_out_D, signals_in_E;
@@ -30,13 +30,27 @@ module core (
         .rs1_addr(signals_out_D.rs1_addr),
         .rs2_addr(signals_out_D.rs2_addr),
         .rd_E(signals_in_E.rd_addr),
-        .rd_M(signals_in_M.rd_addr),
+        .mm_re_E(signals_in_E.mm_re),
 
         .stall_F,
         .stall_D, .flush_D,
         .stall_E, .flush_E,
         .stall_M, .flush_M,
         .stall_W, .flush_W
+    );
+
+    forward forward (
+        .rs1_addr(rs1_addr),
+        .rs1_data_rf(rs1_data_rf),
+        .rs2_addr(rs2_addr),
+        .rs2_data_rf(rs2_data_rf),
+        .rd_addr_M(signals_in_M.rd_addr),
+        .rd_data_M(signals_in_M.data),
+        .rd_addr_W(signals_in_W.rd_addr),
+        .rd_data_W(signals_in_W.data),
+
+        .rs1_data,
+        .rs2_data
     );
 
     // Instruction fetch unit
@@ -92,8 +106,8 @@ module core (
         .rs2_addr,
         .signals_in(signals_in_W),
         
-        .rs1_data,
-        .rs2_data
+        .rs1_data(rs1_data_rf),
+        .rs2_data(rs2_data_rf)
     );
 
     // Fetch-decode pipeline register

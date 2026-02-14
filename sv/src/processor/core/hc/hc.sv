@@ -6,7 +6,7 @@ module hc (
 
     input logic [4:0] rs1_addr, input logic [4:0] rs2_addr,
     input logic [4:0] rd_E,
-    input logic [4:0] rd_M,
+    input logic mm_re_E,
 
     output logic stall_F,
     output logic stall_D, output logic flush_D,
@@ -46,8 +46,7 @@ module hc (
         end
         // RAW hazard
         else if(
-            ((rs1_addr == rd_E | rs2_addr == rd_E) && rd_E != 0) ||
-            ((rs1_addr == rd_M | rs2_addr == rd_M) && rd_M != 0)
+            (rs1_addr == rd_E | rs2_addr == rd_E) && rd_E != 0 && mm_re_E
         ) begin
             stall_F = 1;
             stall_D = 1;
