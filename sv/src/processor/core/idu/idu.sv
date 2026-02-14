@@ -129,7 +129,7 @@ module idu (
             signals_out.imm = {{(XLEN-31){signals_in.instr[31]}}, signals_in.instr[30:12], {12{1'b0}}};
         end
         default: begin
-            $warning("Unsupported opcode");
+            $warning("Unsupported opcode %h", opcode);
             signals_out.rs1_addr = 0;
             signals_out.rs2_addr = 0;
             signals_out.rd_addr = 0;

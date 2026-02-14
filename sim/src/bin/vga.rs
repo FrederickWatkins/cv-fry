@@ -155,8 +155,9 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'running,
-                Event::KeyDown { keycode: Some(Keycode::A), .. } => {
-                     println!("The 'A' key was pressed!");
+                Event::KeyDown { keycode: Some(c), .. } => {
+                    state.memory[0xb0000] = state.memory[0xb0000] | 1;
+                    state.memory[0xb0004] = c.into_i32() as u8;
                 }
                 _ => {}
             }
