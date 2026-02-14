@@ -12,28 +12,25 @@ extern "C"
     void vlsu_eval(Vlsu *dut) { dut->eval(); }
 
     // Port Setters
-    void vlsu_set_dr_ack(Vlsu *dut, uint8_t val) { dut->dr_ack = val; }
-    void vlsu_set_dw_ack(Vlsu *dut, uint8_t val) { dut->dw_ack = val; }
+    void vlsu_set_data_ack(Vlsu *dut, uint8_t val) { dut->data_ack = val; }
     void vlsu_set_mm_we(Vlsu *dut, uint8_t val) { dut->mm_we = val; }
     void vlsu_set_mm_re(Vlsu *dut, uint8_t val) { dut->mm_re = val; }
     void vlsu_set_funct3(Vlsu *dut, uint8_t val) { dut->funct3 = val; }
     void vlsu_set_rd_addr_in(Vlsu *dut, uint8_t val) { dut->rd_addr_in = val; }
     
-    void vlsu_set_dr_data(Vlsu *dut, uint32_t val) { dut->dr_data = val; }
+    void vlsu_set_data_r(Vlsu *dut, uint32_t val) { dut->data_r = val; }
     void vlsu_set_data_in(Vlsu *dut, uint32_t val) { dut->data_in = val; }
     void vlsu_set_mm_addr(Vlsu *dut, uint32_t val) { dut->mm_addr = val; }
 
     // Port Getters
     uint8_t  vlsu_get_busy(Vlsu *dut) { return dut->busy; }
-    uint8_t  vlsu_get_dr_re(Vlsu *dut) { return dut->dr_re; }
-    uint8_t  vlsu_get_dr_sel(Vlsu *dut) { return dut->dr_sel; }
-    uint8_t  vlsu_get_dw_we(Vlsu *dut) { return dut->dw_we; }
-    uint8_t  vlsu_get_dw_sel(Vlsu *dut) { return dut->dw_sel; }
+    uint8_t  vlsu_get_data_re(Vlsu *dut) { return dut->data_re; }
+    uint8_t  vlsu_get_data_sel(Vlsu *dut) { return dut->data_sel; }
+    uint8_t  vlsu_get_data_we(Vlsu *dut) { return dut->data_we; }
     uint8_t  vlsu_get_rd_addr_out(Vlsu *dut) { return dut->rd_addr_out; }
 
-    uint32_t vlsu_get_dr_addr(Vlsu *dut) { return dut->dr_addr; }
-    uint32_t vlsu_get_dw_addr(Vlsu *dut) { return dut->dw_addr; }
-    uint32_t vlsu_get_dw_data(Vlsu *dut) { return dut->dw_data; }
+    uint32_t vlsu_get_data_addr(Vlsu *dut) { return dut->data_addr; }
+    uint32_t vlsu_get_data_w(Vlsu *dut) { return dut->data_w; }
     uint32_t vlsu_get_data_out(Vlsu *dut) { return dut->data_out; }
 
     // Tracing

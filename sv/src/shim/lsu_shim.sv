@@ -3,19 +3,14 @@ import pipeline::memory_signals;
 import pipeline::writeback_signals;
 
 module lsu_shim (
-    // Data Bus Read Interface (c2c_r)
-    input  logic             dr_ack,
-    input  logic [XLEN-1:0]  dr_data,
-    output logic             dr_re,
-    output logic [XLEN/8-1:0] dr_sel,
-    output logic [XLEN-1:0]  dr_addr,
-
-    // Data Bus Write Interface (c2c_w)
-    input  logic             dw_ack,
-    output logic             dw_we,
-    output logic [XLEN/8-1:0] dw_sel,
-    output logic [XLEN-1:0]  dw_addr,
-    output logic [XLEN-1:0]  dw_data,
+    // Data bus
+    input  logic             data_ack,
+    input  logic [XLEN-1:0]  data_r,
+    output logic             data_re,
+    output logic             data_we,
+    output logic [XLEN/8-1:0] data_sel,
+    output logic [XLEN-1:0]  data_addr,
+    output logic [XLEN-1:0]  data_w,
 
     // Control/Data Inputs
     input logic mm_we,
@@ -32,22 +27,16 @@ module lsu_shim (
 );
 
     // Instantiate Interfaces
-    c2c_r data_bus_r ();
-    c2c_w data_bus_w ();
+    c2c_data data_bus ();
 
     // Map Read Interface
-    assign data_bus_r.ack  = dr_ack;
-    assign data_bus_r.data = dr_data;
-    assign dr_re           = data_bus_r.re;
-    assign dr_sel          = data_bus_r.sel;
-    assign dr_addr         = data_bus_r.addr;
-
-    // Map Write Interface
-    assign data_bus_w.ack  = dw_ack;
-    assign dw_we           = data_bus_w.we;
-    assign dw_sel          = data_bus_w.sel;
-    assign dw_addr         = data_bus_w.addr;
-    assign dw_data         = data_bus_w.data;
+    assign data_bus.ack  = data_ack;
+    assign data_bus.data_r = data_r;
+    assign data_re = data_bus.re;
+    assign data_we = data_bus.we;
+    assign data_sel = data_bus.sel;
+    assign data_addr = data_bus.addr;
+    assign data_w = data_bus.data_w;
 
     memory_signals signals_in;
     writeback_signals signals_out;
@@ -63,8 +52,7 @@ module lsu_shim (
     assign rd_addr_out = signals_out.rd_addr;
 
     lsu lsu_inst (
-        .data_bus_r(data_bus_r.master),
-        .data_bus_w(data_bus_w.master),
+        .data_bus(data_bus.master),
 
         .signals_in(signals_in),
 

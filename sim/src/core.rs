@@ -15,21 +15,18 @@ impl Core {
     // Bus Input Setters
     pub fn set_instr_ack(&mut self, val: u8) { unsafe { vcore_set_instr_ack(self.ptr, val); } }
     pub fn set_instr_data(&mut self, val: u32) { unsafe { vcore_set_instr_data(self.ptr, val); } }
-    pub fn set_dr_ack(&mut self, val: u8) { unsafe { vcore_set_dr_ack(self.ptr, val); } }
-    pub fn set_dr_data(&mut self, val: u32) { unsafe { vcore_set_dr_data(self.ptr, val); } }
-    pub fn set_dw_ack(&mut self, val: u8) { unsafe { vcore_set_dw_ack(self.ptr, val); } }
+    pub fn set_data_ack(&mut self, val: u8) { unsafe { vcore_set_data_ack(self.ptr, val); } }
+    pub fn set_data_r(&mut self, val: u32) { unsafe { vcore_set_data_r(self.ptr, val); } }
 
     // Bus Output Getters
     pub fn get_instr_re(&self) -> u8 { unsafe { vcore_get_instr_re(self.ptr) } }
     pub fn get_instr_addr(&self) -> u32 { unsafe { vcore_get_instr_addr(self.ptr) } }
     pub fn get_instr_sel(&self) -> u8 { unsafe { vcore_get_instr_sel(self.ptr) } }
-    pub fn get_dr_re(&self) -> u8 { unsafe { vcore_get_dr_re(self.ptr) } }
-    pub fn get_dr_addr(&self) -> u32 { unsafe { vcore_get_dr_addr(self.ptr) } }
-    pub fn get_dr_sel(&self) -> u8 { unsafe { vcore_get_dr_sel(self.ptr) } }
-    pub fn get_dw_we(&self) -> u8 { unsafe { vcore_get_dw_we(self.ptr) } }
-    pub fn get_dw_addr(&self) -> u32 { unsafe { vcore_get_dw_addr(self.ptr) } }
-    pub fn get_dw_data(&self) -> u32 { unsafe { vcore_get_dw_data(self.ptr) } }
-    pub fn get_dw_sel(&self) -> u8 { unsafe { vcore_get_dw_sel(self.ptr) } }
+    pub fn get_data_re(&self) -> u8 { unsafe { vcore_get_data_re(self.ptr) } }
+    pub fn get_data_addr(&self) -> u32 { unsafe { vcore_get_data_addr(self.ptr) } }
+    pub fn get_data_sel(&self) -> u8 { unsafe { vcore_get_data_sel(self.ptr) } }
+    pub fn get_data_we(&self) -> u8 { unsafe { vcore_get_data_we(self.ptr) } }
+    pub fn get_data_w(&self) -> u32 { unsafe { vcore_get_data_w(self.ptr) } }
     
 }
 
@@ -86,8 +83,8 @@ impl DutSync for Core {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::c2c_r::C2cR;
-    use crate::utils::c2c_w::C2cW;
+    use crate::bus::c2c_instr::C2cInstr;
+    use crate::bus::c2c_data::C2cData;
 
     #[test]
     fn sub_and_store() {
@@ -128,7 +125,7 @@ mod tests {
             // nop
             0x13, 0x00, 0x00, 0x00,
         ];
-        let mut instr_bus = C2cR::new(1);
+        let mut instr_bus = C2cInstr::new(1);
         let mut ack;
         let mut instr;
         core.reset();
@@ -139,8 +136,8 @@ mod tests {
             core.tick();
         }
 
-        assert_eq!(core.get_dw_data(), 0xDECAFBAD - 0xDEADBEEF);
-        assert_eq!(core.get_dw_we(), 1);
+        assert_eq!(core.get_data_w(), 0xDECAFBAD - 0xDEADBEEF);
+        assert_eq!(core.get_data_we(), 1);
     }
 
     #[test]
@@ -174,24 +171,20 @@ mod tests {
         let binary = env!("PAYLOAD_STRESSTEST");
         let mut memory = std::fs::read(binary).unwrap();
         memory.resize(0x1000000, 0);
-        let mut instr_bus = C2cR::new(0);
-        let mut data_bus_r = C2cR::new(0);
-        let mut data_bus_w = C2cW::new(0);
+        let mut instr_bus = C2cInstr::new(0);
+        let mut data_bus = C2cData::new(0);
         let mut instr_ack;
-        let mut data_r_ack;
+        let mut data_ack;
         let mut data_r;
-        let mut data_w_ack;
         let mut instr;
         core.reset();
         for _ in 0..1000 {
             (instr_ack, instr) = instr_bus.respond(&memory, core.get_instr_re()==1, core.get_instr_sel(), core.get_instr_addr());
             core.set_instr_ack(instr_ack as u8);
             core.set_instr_data(instr);
-            (data_r_ack, data_r) = data_bus_r.respond(&memory, core.get_dr_re()==1, core.get_dr_sel(), core.get_dr_addr());
-            core.set_dr_ack(data_r_ack as u8);
-            core.set_dr_data(data_r);
-            data_w_ack = data_bus_w.respond(&mut memory, core.get_dw_we()==1, core.get_dw_sel(), core.get_dw_addr(), core.get_dw_data());
-            core.set_dw_ack(data_w_ack as u8);
+            (data_ack, data_r) = data_bus.respond(&mut memory, core.get_data_we()==1, core.get_data_re()==1, core.get_data_sel(), core.get_data_addr(), core.get_data_w());
+            core.set_data_ack(data_ack as u8);
+            core.set_data_r(data_r);
             core.tick();
         }
         for i in 0..23 {

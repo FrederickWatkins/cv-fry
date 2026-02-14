@@ -80,7 +80,7 @@ impl DutSync for Ifu {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::c2c_r::C2cR;
+    use crate::bus::c2c_instr::C2cInstr;
 
     #[test]
     fn test_increments() {
@@ -94,7 +94,7 @@ mod tests {
         ];
         let mut ack = false;
         let mut instr;
-        let mut instr_bus = C2cR::new(3);
+        let mut instr_bus = C2cInstr::new(3);
         ifu.reset();
         assert_eq!(ifu.get_curr_pc(), 0);
         for i in 0..40 {

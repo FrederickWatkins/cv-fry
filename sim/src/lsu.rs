@@ -13,25 +13,22 @@ impl Lsu {
     }
 
     // Input Methods
-    pub fn set_dr_ack(&mut self, val: u8) { unsafe { vlsu_set_dr_ack(self.ptr, val); } }
-    pub fn set_dw_ack(&mut self, val: u8) { unsafe { vlsu_set_dw_ack(self.ptr, val); } }
+    pub fn set_data_ack(&mut self, val: u8) { unsafe { vlsu_set_data_ack(self.ptr, val); } }
     pub fn set_mm_we(&mut self, val: u8) { unsafe { vlsu_set_mm_we(self.ptr, val); } }
     pub fn set_mm_re(&mut self, val: u8) { unsafe { vlsu_set_mm_re(self.ptr, val); } }
     pub fn set_funct3(&mut self, val: u8) { unsafe { vlsu_set_funct3(self.ptr, val); } }
-    pub fn set_dr_data(&mut self, val: u32) { unsafe { vlsu_set_dr_data(self.ptr, val); } }
+    pub fn set_data_r(&mut self, val: u32) { unsafe { vlsu_set_data_r(self.ptr, val); } }
     pub fn set_data_in(&mut self, val: u32) { unsafe { vlsu_set_data_in(self.ptr, val); } }
     pub fn set_mm_addr(&mut self, val: u32) { unsafe { vlsu_set_mm_addr(self.ptr, val); } }
     pub fn set_rd_addr_in(&mut self, val: u8) { unsafe { vlsu_set_rd_addr_in(self.ptr, val) } }
 
     // Output Methods
     pub fn get_busy(&self) -> u8 { unsafe { vlsu_get_busy(self.ptr) } }
-    pub fn get_dr_re(&self) -> u8 { unsafe { vlsu_get_dr_re(self.ptr) } }
-    pub fn get_dr_sel(&self) -> u8 { unsafe { vlsu_get_dr_sel(self.ptr) } }
-    pub fn get_dw_we(&self) -> u8 { unsafe { vlsu_get_dw_we(self.ptr) } }
-    pub fn get_dw_sel(&self) -> u8 { unsafe { vlsu_get_dw_sel(self.ptr) } }
-    pub fn get_dr_addr(&self) -> u32 { unsafe { vlsu_get_dr_addr(self.ptr) } }
-    pub fn get_dw_addr(&self) -> u32 { unsafe { vlsu_get_dw_addr(self.ptr) } }
-    pub fn get_dw_data(&self) -> u32 { unsafe { vlsu_get_dw_data(self.ptr) } }
+    pub fn get_data_re(&self) -> u8 { unsafe { vlsu_get_data_re(self.ptr) } }
+    pub fn get_data_sel(&self) -> u8 { unsafe { vlsu_get_data_sel(self.ptr) } }
+    pub fn get_data_we(&self) -> u8 { unsafe { vlsu_get_data_we(self.ptr) } }
+    pub fn get_data_addr(&self) -> u32 { unsafe { vlsu_get_data_addr(self.ptr) } }
+    pub fn get_data_w(&self) -> u32 { unsafe { vlsu_get_data_w(self.ptr) } }
     pub fn get_data_out(&self) -> u32 { unsafe { vlsu_get_data_out(self.ptr) } }
     pub fn get_rd_addr_out(&self) -> u8 { unsafe {vlsu_get_rd_addr_out(self.ptr) } }
 }
@@ -55,11 +52,11 @@ mod tests {
     #[test]
     fn read_stall() {
         let mut lsu = Lsu::new();
-        lsu.set_dr_ack(0);
+        lsu.set_data_ack(0);
         lsu.set_mm_re(1);
         lsu.eval();
         assert_eq!(lsu.get_busy(), 1);
-        lsu.set_dr_ack(1);
+        lsu.set_data_ack(1);
         lsu.eval();
         assert_eq!(lsu.get_busy(), 0);
         lsu.set_mm_re(0);
@@ -70,11 +67,11 @@ mod tests {
     #[test]
     fn write_stall() {
         let mut lsu = Lsu::new();
-        lsu.set_dw_ack(0);
+        lsu.set_data_ack(0);
         lsu.set_mm_we(1);
         lsu.eval();
         assert_eq!(lsu.get_busy(), 1);
-        lsu.set_dw_ack(1);
+        lsu.set_data_ack(1);
         lsu.eval();
         assert_eq!(lsu.get_busy(), 0);
         lsu.set_mm_we(0);

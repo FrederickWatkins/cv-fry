@@ -1,13 +1,13 @@
 use cv_fry_sim::core::Core;
-use cv_fry_sim::utils::c2c_r::C2cR;
-use cv_fry_sim::utils::c2c_w::C2cW;
+use cv_fry_sim::bus::c2c_instr::C2cInstr;
+use cv_fry_sim::bus::c2c_data::C2cData;
 use cv_fry_sim::utils::dut::DutSync;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
-use sdl2::render::{Texture, TextureCreator};
+use sdl2::render::TextureCreator;
 use sdl2::video::WindowContext;
 use std::time::Duration;
 use sdl2::hint;
@@ -43,9 +43,8 @@ const PALETTE: [Color; 16] = [
 struct EmulatorState {
     memory: Vec<u8>,
     core: Core,
-    instr_bus: C2cR,
-    data_bus_r: C2cR,
-    data_bus_w: C2cW,
+    instr_bus: C2cInstr,
+    data_bus: C2cData,
     cycles_per_refresh: usize,
 }
 
@@ -62,9 +61,8 @@ impl EmulatorState {
         Self {
             memory,
             core,
-            instr_bus: C2cR::new(0),
-            data_bus_r: C2cR::new(0),
-            data_bus_w: C2cW::new(0),
+            instr_bus: C2cInstr::new(0),
+            data_bus: C2cData::new(0),
             cycles_per_refresh: 2000,
         }
     }
@@ -82,24 +80,16 @@ impl EmulatorState {
             self.core.set_instr_data(instr);
 
             // Data Read Bus
-            let (data_r_ack, data_r) = self.data_bus_r.respond(
-                &self.memory,
-                self.core.get_dr_re() == 1,
-                self.core.get_dr_sel(),
-                self.core.get_dr_addr(),
-            );
-            self.core.set_dr_ack(data_r_ack as u8);
-            self.core.set_dr_data(data_r);
-
-            // Data Write Bus
-            let data_w_ack = self.data_bus_w.respond(
+            let (data_ack, data_r) = self.data_bus.respond(
                 &mut self.memory,
-                self.core.get_dw_we() == 1,
-                self.core.get_dw_sel(),
-                self.core.get_dw_addr(),
-                self.core.get_dw_data(),
+                self.core.get_data_we() == 1,
+                self.core.get_data_re() == 1,
+                self.core.get_data_sel(),
+                self.core.get_data_addr(),
+                self.core.get_data_w(),
             );
-            self.core.set_dw_ack(data_w_ack as u8);
+            self.core.set_data_ack(data_ack as u8);
+            self.core.set_data_r(data_r);
 
             // Tick Core
             self.core.tick();

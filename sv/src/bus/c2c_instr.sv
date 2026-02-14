@@ -1,13 +1,14 @@
 import pipeline::XLEN;
-// Core to cache read interface
-interface c2c_r;
+// Core to cache instruction interface
+interface c2c_instr;
     logic re, ack;
-    logic [XLEN/8-1:0] sel;
-    logic [XLEN-1:0] addr, data;
+    logic [3:0] sel;
+    logic [XLEN-1:0] addr;
+    logic [31:0] instr;
 
     modport master (
         input ack,
-        input data,
+        input instr,
 
         output re,
         output sel,
@@ -20,6 +21,6 @@ interface c2c_r;
         input addr,
 
         output ack,
-        output data
+        output instr
     );
 endinterface

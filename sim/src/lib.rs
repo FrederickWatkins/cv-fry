@@ -5,3 +5,4 @@ pub mod pc;
 pub mod lsu;
 pub mod jbu;
 pub mod core;
+pub mod bus;

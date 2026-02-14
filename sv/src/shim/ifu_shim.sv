@@ -21,11 +21,11 @@ module ifu_shim (
     output logic [XLEN-1:0] inc_pc
 );
 
-    c2c_r instr_bus ();
+    c2c_instr instr_bus ();
     decode_signals signals_out_F;
 
     assign instr_bus.ack = ack;
-    assign instr_bus.data = instr;
+    assign instr_bus.instr = instr;
 
     always_ff @(posedge clk) begin
         re <= instr_bus.re;

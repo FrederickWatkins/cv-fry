@@ -3,10 +3,9 @@ module core (
     input logic clk,
     input logic reset_n,
 
-    c2c_r.master instr_bus,
+    c2c_instr.master instr_bus,
 
-    c2c_r.master data_bus_r,
-    c2c_w.master data_bus_w
+    c2c_data.master data_bus
 );
     import pipeline::*;
 
@@ -89,8 +88,7 @@ module core (
 
     // Load store unit
     lsu lsu (
-        .data_bus_r,
-        .data_bus_w,
+        .data_bus,
 
         .signals_in(signals_in_M),
 

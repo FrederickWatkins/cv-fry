@@ -5,7 +5,7 @@ module ifu (
     input logic clk,
     input logic reset_n,
 
-    c2c_r.master instr_bus,
+    c2c_instr.master instr_bus,
 
     input logic stall,
     input logic je,
@@ -47,7 +47,7 @@ module ifu (
     );
 
     decomp decomp (
-        .instr_in(instr_bus.data),
+        .instr_in(instr_bus.instr),
 
         .compressed,
         .instr_out(decomp_instr)
