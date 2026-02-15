@@ -19,7 +19,7 @@ extern "C"
     void vifu_set_ack(Vifu *dut, uint8_t val) { dut->ack = val; }
 
     // Port Setters (32-bit)
-    void vifu_set_ja(Vifu *dut, uint32_t val) { dut->ja = val; }
+    void vifu_set_ja(Vifu *dut, uint64_t val) { dut->ja = val; }
     void vifu_set_instr(Vifu *dut, uint32_t val) { dut->instr = val; }
 
     // Port Getters (Booleans/8-bit)
@@ -27,9 +27,9 @@ extern "C"
     uint8_t vifu_get_sel(Vifu *dut) { return dut->sel; }
 
     // Port Getters (32-bit)
-    uint32_t vifu_get_curr_pc(Vifu *dut) { return dut->curr_pc; }
-    uint32_t vifu_get_inc_pc(Vifu *dut) { return dut->inc_pc; }
-    uint32_t vifu_get_addr(Vifu *dut) { return dut->addr; }
+    uint64_t vifu_get_curr_pc(Vifu *dut) { return dut->curr_pc; }
+    uint64_t vifu_get_inc_pc(Vifu *dut) { return dut->inc_pc; }
+    uint64_t vifu_get_addr(Vifu *dut) { return dut->addr; }
     uint32_t vifu_get_instr_out(Vifu *dut) { return dut->instr_out; }
 
     // Tracing

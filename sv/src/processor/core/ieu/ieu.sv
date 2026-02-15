@@ -37,6 +37,7 @@ module ieu (
     end
 
     alu alu (
+        .word(signals_in.word),
         .funct3(signals_in.alu_funct3),
         .funct7(signals_in.funct7),
 

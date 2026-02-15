@@ -7,11 +7,11 @@ unsafe extern "C" {
     pub fn vpc_set_stall(dut: *mut std::ffi::c_void, val: u8);
     pub fn vpc_set_compressed(dut: *mut std::ffi::c_void, val: u8);
     pub fn vpc_set_je(dut: *mut std::ffi::c_void, val: u8);
-    pub fn vpc_set_ja(dut: *mut std::ffi::c_void, val: u32);
+    pub fn vpc_set_ja(dut: *mut std::ffi::c_void, val: u64);
     pub fn vpc_set_reset_n(dut: *mut std::ffi::c_void, val: u8);
-    pub fn vpc_get_curr_pc(dut: *mut std::ffi::c_void) -> u32;
-    pub fn vpc_get_inc_pc(dut: *mut std::ffi::c_void) -> u32;
-    pub fn vpc_get_next_pc(dut: *mut std::ffi::c_void) -> u32;
+    pub fn vpc_get_curr_pc(dut: *mut std::ffi::c_void) -> u64;
+    pub fn vpc_get_inc_pc(dut: *mut std::ffi::c_void) -> u64;
+    pub fn vpc_get_next_pc(dut: *mut std::ffi::c_void) -> u64;
     pub fn vpc_trace_init(
         dut: *mut std::ffi::c_void,
         filename: *const std::ffi::c_char,

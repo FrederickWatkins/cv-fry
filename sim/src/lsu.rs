@@ -17,9 +17,9 @@ impl Lsu {
     pub fn set_mm_we(&mut self, val: u8) { unsafe { vlsu_set_mm_we(self.ptr, val); } }
     pub fn set_mm_re(&mut self, val: u8) { unsafe { vlsu_set_mm_re(self.ptr, val); } }
     pub fn set_funct3(&mut self, val: u8) { unsafe { vlsu_set_funct3(self.ptr, val); } }
-    pub fn set_data_r(&mut self, val: u32) { unsafe { vlsu_set_data_r(self.ptr, val); } }
-    pub fn set_data_in(&mut self, val: u32) { unsafe { vlsu_set_data_in(self.ptr, val); } }
-    pub fn set_mm_addr(&mut self, val: u32) { unsafe { vlsu_set_mm_addr(self.ptr, val); } }
+    pub fn set_data_r(&mut self, val: u64) { unsafe { vlsu_set_data_r(self.ptr, val); } }
+    pub fn set_data_in(&mut self, val: u64) { unsafe { vlsu_set_data_in(self.ptr, val); } }
+    pub fn set_mm_addr(&mut self, val: u64) { unsafe { vlsu_set_mm_addr(self.ptr, val); } }
     pub fn set_rd_addr_in(&mut self, val: u8) { unsafe { vlsu_set_rd_addr_in(self.ptr, val) } }
 
     // Output Methods
@@ -27,9 +27,9 @@ impl Lsu {
     pub fn get_data_re(&self) -> u8 { unsafe { vlsu_get_data_re(self.ptr) } }
     pub fn get_data_sel(&self) -> u8 { unsafe { vlsu_get_data_sel(self.ptr) } }
     pub fn get_data_we(&self) -> u8 { unsafe { vlsu_get_data_we(self.ptr) } }
-    pub fn get_data_addr(&self) -> u32 { unsafe { vlsu_get_data_addr(self.ptr) } }
-    pub fn get_data_w(&self) -> u32 { unsafe { vlsu_get_data_w(self.ptr) } }
-    pub fn get_data_out(&self) -> u32 { unsafe { vlsu_get_data_out(self.ptr) } }
+    pub fn get_data_addr(&self) -> u64 { unsafe { vlsu_get_data_addr(self.ptr) } }
+    pub fn get_data_w(&self) -> u64 { unsafe { vlsu_get_data_w(self.ptr) } }
+    pub fn get_data_out(&self) -> u64 { unsafe { vlsu_get_data_out(self.ptr) } }
     pub fn get_rd_addr_out(&self) -> u8 { unsafe {vlsu_get_rd_addr_out(self.ptr) } }
 }
 

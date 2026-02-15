@@ -13,14 +13,14 @@ impl Ifu {
     pub fn set_stall(&mut self, val: u8) {unsafe {vifu_set_stall(self.ptr, val);}}
     pub fn set_ack(&mut self, val: u8) {unsafe {vifu_set_ack(self.ptr, val);}}
     pub fn set_je(&mut self, val: u8) {unsafe {vifu_set_je(self.ptr, val);}}
-    pub fn set_ja(&mut self, val: u32) {unsafe {vifu_set_ja(self.ptr, val);}}
+    pub fn set_ja(&mut self, val: u64) {unsafe {vifu_set_ja(self.ptr, val);}}
     pub fn set_instr(&mut self, val: u32) {unsafe {vifu_set_instr(self.ptr, val);}}
     pub fn eval(&mut self) {unsafe {vifu_eval(self.ptr);}}
     pub fn get_re(&self) -> u8 {unsafe { vifu_get_re(self.ptr) }}
     pub fn get_sel(&self) -> u8 {unsafe { vifu_get_sel(self.ptr) }}
-    pub fn get_curr_pc(&self) -> u32 {unsafe { vifu_get_curr_pc(self.ptr) }}
-    pub fn get_inc_pc(&self) -> u32 {unsafe { vifu_get_inc_pc(self.ptr) }}
-    pub fn get_addr(&self) -> u32 {unsafe { vifu_get_addr(self.ptr) }}
+    pub fn get_curr_pc(&self) -> u64 {unsafe { vifu_get_curr_pc(self.ptr) }}
+    pub fn get_inc_pc(&self) -> u64 {unsafe { vifu_get_inc_pc(self.ptr) }}
+    pub fn get_addr(&self) -> u64 {unsafe { vifu_get_addr(self.ptr) }}
     pub fn get_instr_out(&self) -> u32 {unsafe { vifu_get_instr_out(self.ptr) }}
 }
 
@@ -97,12 +97,12 @@ mod tests {
         let mut instr_bus = C2cInstr::new(3);
         ifu.reset();
         assert_eq!(ifu.get_curr_pc(), 0);
-        for i in 0..40 {
+        for i in 0u64..40u64 {
             if !ack {
                 assert_eq!(ifu.get_instr_out(), 0x00000004)
             }
             if ack {
-                assert_eq!(ifu.get_instr_out() >> 22, (i - 1) / 4);
+                assert_eq!(ifu.get_instr_out() >> 22, ((i - 1) / 4) as u32);
             }
             (ack, instr) =
                 instr_bus.respond(&memory, ifu.get_re() == 1, ifu.get_sel(), ifu.get_addr());

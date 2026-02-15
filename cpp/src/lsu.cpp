@@ -18,9 +18,9 @@ extern "C"
     void vlsu_set_funct3(Vlsu *dut, uint8_t val) { dut->funct3 = val; }
     void vlsu_set_rd_addr_in(Vlsu *dut, uint8_t val) { dut->rd_addr_in = val; }
     
-    void vlsu_set_data_r(Vlsu *dut, uint32_t val) { dut->data_r = val; }
-    void vlsu_set_data_in(Vlsu *dut, uint32_t val) { dut->data_in = val; }
-    void vlsu_set_mm_addr(Vlsu *dut, uint32_t val) { dut->mm_addr = val; }
+    void vlsu_set_data_r(Vlsu *dut, uint64_t val) { dut->data_r = val; }
+    void vlsu_set_data_in(Vlsu *dut, uint64_t val) { dut->data_in = val; }
+    void vlsu_set_mm_addr(Vlsu *dut, uint64_t val) { dut->mm_addr = val; }
 
     // Port Getters
     uint8_t  vlsu_get_busy(Vlsu *dut) { return dut->busy; }
@@ -29,9 +29,9 @@ extern "C"
     uint8_t  vlsu_get_data_we(Vlsu *dut) { return dut->data_we; }
     uint8_t  vlsu_get_rd_addr_out(Vlsu *dut) { return dut->rd_addr_out; }
 
-    uint32_t vlsu_get_data_addr(Vlsu *dut) { return dut->data_addr; }
-    uint32_t vlsu_get_data_w(Vlsu *dut) { return dut->data_w; }
-    uint32_t vlsu_get_data_out(Vlsu *dut) { return dut->data_out; }
+    uint64_t vlsu_get_data_addr(Vlsu *dut) { return dut->data_addr; }
+    uint64_t vlsu_get_data_w(Vlsu *dut) { return dut->data_w; }
+    uint64_t vlsu_get_data_out(Vlsu *dut) { return dut->data_out; }
 
     // Tracing
     VerilatedVcdC *vlsu_trace_init(Vlsu *dut, const char *filename)

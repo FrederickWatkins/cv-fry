@@ -1,5 +1,5 @@
 package pipeline;
-    localparam XLEN = 32;
+    localparam XLEN = 64;
 
     typedef struct packed {
         logic [31:2] instr;
@@ -8,6 +8,7 @@ package pipeline;
     } decode_signals;
 
     typedef struct packed {
+        logic word;
         logic jump;
         logic branch;
         logic op1_pc;

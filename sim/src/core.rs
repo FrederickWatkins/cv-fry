@@ -16,17 +16,17 @@ impl Core {
     pub fn set_instr_ack(&mut self, val: u8) { unsafe { vcore_set_instr_ack(self.ptr, val); } }
     pub fn set_instr_data(&mut self, val: u32) { unsafe { vcore_set_instr_data(self.ptr, val); } }
     pub fn set_data_ack(&mut self, val: u8) { unsafe { vcore_set_data_ack(self.ptr, val); } }
-    pub fn set_data_r(&mut self, val: u32) { unsafe { vcore_set_data_r(self.ptr, val); } }
+    pub fn set_data_r(&mut self, val: u64) { unsafe { vcore_set_data_r(self.ptr, val); } }
 
     // Bus Output Getters
     pub fn get_instr_re(&self) -> u8 { unsafe { vcore_get_instr_re(self.ptr) } }
-    pub fn get_instr_addr(&self) -> u32 { unsafe { vcore_get_instr_addr(self.ptr) } }
+    pub fn get_instr_addr(&self) -> u64 { unsafe { vcore_get_instr_addr(self.ptr) } }
     pub fn get_instr_sel(&self) -> u8 { unsafe { vcore_get_instr_sel(self.ptr) } }
     pub fn get_data_re(&self) -> u8 { unsafe { vcore_get_data_re(self.ptr) } }
-    pub fn get_data_addr(&self) -> u32 { unsafe { vcore_get_data_addr(self.ptr) } }
+    pub fn get_data_addr(&self) -> u64 { unsafe { vcore_get_data_addr(self.ptr) } }
     pub fn get_data_sel(&self) -> u8 { unsafe { vcore_get_data_sel(self.ptr) } }
     pub fn get_data_we(&self) -> u8 { unsafe { vcore_get_data_we(self.ptr) } }
-    pub fn get_data_w(&self) -> u32 { unsafe { vcore_get_data_w(self.ptr) } }
+    pub fn get_data_w(&self) -> u64 { unsafe { vcore_get_data_w(self.ptr) } }
     
 }
 
@@ -142,54 +142,105 @@ mod tests {
 
     #[test]
     fn stresstest() {
-        let expected_results: [u32; 23] = [
-            0x12345E77, // [0]  ADDI (a + 0x7FF)
-            0x12344E78, // [1]  ADDI (a - 0x800)
-            0x00000000, // [2]  SLTI (a < 0x100) -> False
-            0x00000001, // [3]  SLTIU (a < 0x7FFFFFFF) -> True
-            0x12345987, // [4]  XORI
-            0x12345679, // [5]  ORI
-            0x00000228, // [6]  ANDI
-            0x000000F0, // [7]  SLLI (0x8000000F << 4)
-            0x08000000, // [8]  SRLI (Logical Shift Right)
-            0xF8000000, // [9]  SRAI (Arithmetic Shift Right - Sign preserved)
-            0xFFFFFFFF, // [10] ADD (0x55555555 + 0xAAAAAAAA)
-            0xAAAAAAAB, // [11] SUB (0x55555555 - 0xAAAAAAAA)
-            0xFFFFFFFF, // [12] XOR
-            0xFFFFFFFF, // [13] OR
-            0x00000000, // [14] AND
-            0x00000000, // [15] SLT (Signed: Positive < Negative) -> False
-            0x0000000B, // [16] branch_check (Sum of successful branches: 1 + 2 + 8)
-            0x44332211, // [17] LW (Little-endian load)
-            0x00006655, // [18] LH
-            0xFFFFFF88, // [19] LB (Sign extended 0x88)
-            0x00000088, // [20] LBU (Zero extended 0x88)
-            0xABCDE000, // [21] LUI (Upper immediate)
-            0xDEADBEEF  // [22] Final Success Marker
+        // Expected results are now u64
+        let expected_results: [u64; 23] = [
+            // --- 1. 64-bit Computational ---
+            0x1122334455667899, // [0] ADDI (0x1122334455667788 + 0x111)
+            0x0000000000000001, // [1] SLTI (True)
+            0xE1D2C3B4A5968778, // [2] XORI
+            0x11223344FFFFFFFF, // [3] ORI
+            0x1122000000007788, // [4] ANDI
+
+            // --- 2. 64-bit Shifts ---
+            0x00000000000000F0, // [5] SLLI (0x8...F << 4) (Overflows top bit)
+            0x0800000000000000, // [6] SRLI (Logical Right)
+            0xF800000000000000, // [7] SRAI (Arithmetic Right - Sign preserved)
+
+            // --- 3. Word (32-bit) Ops (Sign Extension Checks) ---
+            0xFFFFFFFF80000000, // [8] ADDW (0x40000000 + 0x40000000 = 0x80000000 -> Sign Ext)
+            0x0000000023456780, // [9] SLLW (0x12345678 << 4)
+            0xFFFFFFFFFF000000, // [10] SRAW (0xF0000000 >> 4 -> 0xFF000000 -> Sign Ext)
+
+            // --- 4. M Extension ---
+            0xFFFFFFFFFFFFFC18, // [11] MUL (100 * -10 = -1000 = ...FC18)
+            0xFFFFFFFFFFFFFFF6, // [12] DIV (100 / -10 = -10)
+            0x000000000000000A, // [13] REM (100 % 30 = 10)
+            0x0000000000000000, // [14] MULW (0x10000*0x10000=0 in 32-bit)
+
+            // --- 5. Register Ops ---
+            0x00000000FFFFFFFF, // [15] ADD
+            0x0000000055555555, // [16] SUB
+            0x00000000FFFFFFFF, // [17] OR
+            0x0000000000000000, // [18] AND
+
+            // --- 6. Memory Access ---
+            0x8877665544332211, // [19] LD (Little Endian full load)
+            0x0000000044332211, // [20] LWU (Zero extended)
+            0xFFFFFFFFFFFFFFFF, // [21] LW (Sign extended -1)
+
+            // --- Final ---
+            0xDEADBEEFDEADBEEF  // [22] Final Marker
         ];
+
         let mut core = Core::new();
         let binary = env!("PAYLOAD_STRESSTEST");
         let mut memory = std::fs::read(binary).unwrap();
         memory.resize(0x1000000, 0);
+        
+        // Ensure instruction bus is set up for 64-bit if necessary, 
+        // though usually instruction fetch is still 32-bit wide for standard RISC-V 
+        // unless using compressed instructions or wide fetch. 
+        // Assuming standard 32-bit wide instruction bus here based on `C2cInstr`.
         let mut instr_bus = C2cInstr::new(0);
-        let mut data_bus = C2cData::new(0);
+        
+        // Assuming Data Bus needs to handle 64-bit width now? 
+        // If your C2cData is strictly 32-bit, you will need to run two cycles 
+        // or update the bus width. 
+        // *If the bus is 64-bit:*
+        let mut data_bus = C2cData::new(0); 
+
         let mut instr_ack;
         let mut data_ack;
         let mut data_r;
         let mut instr;
+
         core.reset();
-        for _ in 0..1000 {
-            (instr_ack, instr) = instr_bus.respond(&memory, core.get_instr_re()==1, core.get_instr_sel(), core.get_instr_addr());
+        for _ in 0..2000 { // Increased ticks for potentially longer execution
+            (instr_ack, instr) = instr_bus.respond(
+                &memory, 
+                core.get_instr_re() == 1, 
+                core.get_instr_sel(), 
+                core.get_instr_addr()
+            );
             core.set_instr_ack(instr_ack as u8);
             core.set_instr_data(instr);
-            (data_ack, data_r) = data_bus.respond(&mut memory, core.get_data_we()==1, core.get_data_re()==1, core.get_data_sel(), core.get_data_addr(), core.get_data_w());
+
+            (data_ack, data_r) = data_bus.respond(
+                &mut memory, 
+                core.get_data_we() == 1, 
+                core.get_data_re() == 1, 
+                core.get_data_sel(), 
+                core.get_data_addr(), 
+                core.get_data_w()
+            );
             core.set_data_ack(data_ack as u8);
             core.set_data_r(data_r);
             core.tick();
         }
+
         for i in 0..23 {
-            let test_result = u32::from_le_bytes(memory[(0x2000 + i * 4)..(0x2000 + i * 4 + 4)].try_into().unwrap());
-            assert_eq!(test_result, expected_results[i]);
+            // Updated to read 8 bytes (u64)
+            // Offset is now i * 8
+            let addr = 0x2000 + i * 8;
+            let val_bytes = memory[addr..(addr + 8)].try_into().unwrap();
+            let test_result = u64::from_le_bytes(val_bytes);
+            
+            assert_eq!(
+                test_result, 
+                expected_results[i], 
+                "Mismatch at index [{}]: Expected {:#X}, Got {:#X}", 
+                i, expected_results[i], test_result
+            );
         }
     }
 }

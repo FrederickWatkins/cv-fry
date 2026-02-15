@@ -28,9 +28,9 @@ fn main() {
             // Compile C + Entry.S -> ELF
             let clang_status = Command::new("clang")
                 .args(&[
-                    "--target=riscv32",
-                    "-march=rv32i",
-                    "-mabi=ilp32",
+                    "--target=riscv64",
+                    "-march=rv64im",
+                    "-mabi=lp64",
                     "-ffreestanding",
                     "-nostdlib",
                     "-static",
@@ -84,7 +84,7 @@ fn main() {
     // 3. Locate the ELF and convert to BIN
     // Cargo places nested builds in a specific target folder
     let elf_path = out_dir.clone()
-        .join("riscv32im-unknown-none-elf")
+        .join("riscv64im-unknown-none-elf")
         .join("release/cv-fry-payload-rs");
 
     let bin_out = out_dir.join("rust_test.bin");

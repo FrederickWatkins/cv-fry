@@ -124,7 +124,7 @@ module core (
     // Decode-exectue pipeline register
     pipeline_reg #(
         .T(execute_signals),
-        .NOP(execute_signals'{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        .NOP(execute_signals'{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
     ) pipeline_E (
         .clk,
         .reset_n,

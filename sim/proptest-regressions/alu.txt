@@ -9,3 +9,8 @@ cc fcfedfb51fa9146d5aa3c1d18203dc97b5034f9305e97fe4527e78940fcd4abf # shrinks to
 cc 050902cb96e320226843b041d8e399e772183dcd7bc8b9cec96ac98c6f74a474 # shrinks to funct3 = 2, funct7 = 1, op1 = 1, op2 = -1
 cc dd9416c4c67579bbeda59c820669eb8e401d6d81b7d686aa1cd8c939acd74b09 # shrinks to funct3 = 3, funct7 = 1, op1 = -1, op2 = 1
 cc 1e48febcc8555e4d1519c19ccf007a907f52035a3474bcff0da0e346b7c4ebb5 # shrinks to funct3 = 3, funct7 = 1, op1 = -1, op2 = -1
+cc bd97c456511f786b7ae7158343ddeb1f7548a67bb796fc499c758d53017f0bbb # shrinks to funct3 = 5, funct7 = 0, op1 = -1, op2 = -80307265
+cc f087691d90df7660ef45afb8e8882514c86a83cc0e967eba36c4de448f1fb5a9 # shrinks to funct3 = 1, funct7 = 1, op1 = -2, op2 = 4286479708331180032
+cc 5ea3e74d8bdbd46a8e193102f2572a6108e70d4775ed9d93e2de641662ff0b3a # shrinks to funct3 = 1, funct7 = 1, op1 = -1, op2 = -1318985721469468673
+cc 1aef5d6ea17b0020bcc03ceb574d96321c776cfb01302e5acd9e74f3cf41a986 # shrinks to funct3 = 2, funct7 = 1, op1 = 2, op2 = -1
+cc 433225a2c0fec9cfe5c98a80bc070daaf329556986ee0c223d6fdda435dca044 # shrinks to funct3 = 5, funct7 = 1, op1 = -1, op2 = 2

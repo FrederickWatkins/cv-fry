@@ -1,14 +1,14 @@
 pub struct C2cInstr {
-    delay: u32,
-    request_latency: u32,
+    delay: u64,
+    request_latency: u64,
 }
 
 impl C2cInstr {
-    pub fn new(delay: u32) -> Self {
+    pub fn new(delay: u64) -> Self {
         Self {delay: delay, request_latency: delay}
     }
 
-    pub fn respond(&mut self, memory: &[u8], re: bool, sel: u8, addr: u32) -> (bool, u32) {
+    pub fn respond(&mut self, memory: &[u8], re: bool, sel: u8, addr: u64) -> (bool, u32) {
         if re {
             if self.request_latency == 0 {
                 let mut response = 0;

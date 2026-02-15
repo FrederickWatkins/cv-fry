@@ -1,17 +1,17 @@
 pub struct C2cData {
-    delay: u32,
-    request_latency: u32,
+    delay: u64,
+    request_latency: u64,
 }
 
 impl C2cData {
-    pub fn new(delay: u32) -> Self {
+    pub fn new(delay: u64) -> Self {
         Self {delay: delay, request_latency: delay}
     }
 
-    pub fn respond(&mut self, memory: &mut [u8], we: bool, re: bool, sel: u8, addr: u32, data: u32) -> (bool, u32) {
+    pub fn respond(&mut self, memory: &mut [u8], we: bool, re: bool, sel: u8, addr: u64, data: u64) -> (bool, u64) {
         if we {
             if self.request_latency == 0 {
-                for i in 0..4 {
+                for i in 0..8 {
                     if (sel >> i) & 1 == 1 {
                         memory[addr as usize + i] = ((data >> i * 8) & 0xFF) as u8;
                     }
@@ -25,9 +25,9 @@ impl C2cData {
         } else if re {
             if self.request_latency == 0 {
                 let mut response = 0;
-                for i in 0..4 {
+                for i in 0..8 {
                     if (sel >> i) & 1 == 1 {
-                        response |= (memory[addr as usize + i] as u32) << (i*8);
+                        response |= (memory[addr as usize + i] as u64) << (i*8);
                     }
                 }
                 self.request_latency = self.delay;

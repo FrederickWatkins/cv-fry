@@ -18,12 +18,12 @@ extern "C" {
     void vpc_set_je(Vpc* dut, uint8_t val) { dut->je = val; }
     
     // Port Setters (32-bit)
-    void vpc_set_ja(Vpc* dut, uint32_t val) { dut->ja = val; }
+    void vpc_set_ja(Vpc* dut, uint64_t val) { dut->ja = val; }
 
     // Port Getters
-    uint32_t vpc_get_curr_pc(Vpc* dut) { return dut->curr_pc; }
-    uint32_t vpc_get_inc_pc(Vpc* dut) { return dut->inc_pc; }
-    uint32_t vpc_get_next_pc(Vpc* dut) { return dut->next_pc; }
+    uint64_t vpc_get_curr_pc(Vpc* dut) { return dut->curr_pc; }
+    uint64_t vpc_get_inc_pc(Vpc* dut) { return dut->inc_pc; }
+    uint64_t vpc_get_next_pc(Vpc* dut) { return dut->next_pc; }
 
     // Tracing
     VerilatedVcdC* vpc_trace_init(Vpc* dut, const char* filename) {

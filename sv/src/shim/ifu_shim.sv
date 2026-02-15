@@ -9,7 +9,7 @@ module ifu_shim (
     input logic [31:0] instr,
 
     output logic re,
-    output logic [XLEN/8-1:0] sel,
+    output logic [3:0] sel,
     output logic [XLEN-1:0] addr,
 
     input logic stall,

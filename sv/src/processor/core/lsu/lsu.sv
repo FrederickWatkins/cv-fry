@@ -14,6 +14,7 @@ module lsu (
     localparam BYTE = 2'b00;
     localparam HALF = 2'b01;
     localparam WORD = 2'b10;
+    localparam DOUBLE = 2'b11;
 
     localparam SIGNED = 1'b0;
     localparam UNSIGNED = 1'b1;
@@ -26,16 +27,16 @@ module lsu (
     always_comb begin
         case(signals_in.funct3[1:0])
         BYTE: begin
-            data_bus.sel = 'b0001;
+            data_bus.sel = 'b00000001;
         end
         HALF: begin
-            data_bus.sel = 'b0011;
+            data_bus.sel = 'b00000011;
         end
         WORD: begin
-            data_bus.sel = 'b1111;
+            data_bus.sel = 'b00001111;
         end
-        default: begin
-            data_bus.sel = 'b1111;
+        DOUBLE: begin
+            data_bus.sel = 'b11111111;
         end
         endcase
         
@@ -49,6 +50,7 @@ module lsu (
                 {SIGNED, BYTE}: signals_out.data = {{(XLEN-7){data_bus.data_r[7]}}, data_bus.data_r[6:0]};
                 {SIGNED, HALF}: signals_out.data = {{(XLEN-15){data_bus.data_r[15]}}, data_bus.data_r[14:0]};
                 {SIGNED, WORD}: signals_out.data = {{(XLEN-31){data_bus.data_r[31]}}, data_bus.data_r[30:0]};
+                {SIGNED, DOUBLE}: signals_out.data = data_bus.data_r;
                 {UNSIGNED, BYTE}: signals_out.data = {{(XLEN-8){1'b0}}, data_bus.data_r[7:0]};
                 {UNSIGNED, HALF}: signals_out.data = {{(XLEN-16){1'b0}}, data_bus.data_r[15:0]};
                 {UNSIGNED, WORD}: signals_out.data = {{(XLEN-32){1'b0}}, data_bus.data_r[31:0]};

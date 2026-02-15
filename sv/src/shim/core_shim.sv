@@ -7,7 +7,7 @@ module core_shim (
     input  logic             instr_ack,
     input  logic [31:0]      instr_data,
     output logic             instr_re,
-    output logic [XLEN/8-1:0] instr_sel,
+    output logic [3:0] instr_sel,
     output logic [XLEN-1:0]  instr_addr,
 
     // Data Bus (c2c_data master)

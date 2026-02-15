@@ -30,7 +30,7 @@ impl ProgramCounter {
         }
     }
 
-    pub fn set_ja(&mut self, val: u32) {
+    pub fn set_ja(&mut self, val: u64) {
         unsafe {
             vpc_set_ja(self.ptr, val);
         }
@@ -42,15 +42,15 @@ impl ProgramCounter {
         }
     }
 
-    pub fn get_curr_pc(&self) -> u32 {
+    pub fn get_curr_pc(&self) -> u64 {
         unsafe { vpc_get_curr_pc(self.ptr) }
     }
 
-    pub fn get_inc_pc(&self) -> u32 {
+    pub fn get_inc_pc(&self) -> u64 {
         unsafe { vpc_get_inc_pc(self.ptr) }
     }
 
-    pub fn get_next_pc(&self) -> u32 {
+    pub fn get_next_pc(&self) -> u64 {
         unsafe { vpc_get_next_pc(self.ptr) }
     }
 }

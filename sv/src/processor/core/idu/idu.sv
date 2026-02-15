@@ -19,7 +19,9 @@ module idu (
         OP = 'b01100,
         SYSTEM = 'b11100,
         AUIPC = 'b00101,
-        LUI = 'b01101
+        LUI = 'b01101,
+        OP_IMM_32 = 'b00110,
+        OP_32 = 'b01110
     } opcodes;
 
     logic [4:0] opcode;
@@ -30,6 +32,7 @@ module idu (
     assign opcode = signals_in.instr[6:2];
 
     always_comb begin
+        signals_out.word = 0;
         signals_out.rs1_addr = signals_in.instr[19:15];
         signals_out.rs2_addr = signals_in.instr[24:20];
         signals_out.jump = 0;
@@ -127,6 +130,21 @@ module idu (
             signals_out.alu_funct3 = 'b000; // Use alu to add immediate to zero
             signals_out.funct7 = 0;
             signals_out.imm = {{(XLEN-31){signals_in.instr[31]}}, signals_in.instr[30:12], {12{1'b0}}};
+        end
+        OP_IMM_32: begin
+            signals_out.word = 1;
+            signals_out.rs2_addr = 0;
+            signals_out.op2_imm = 1;
+            signals_out.funct7 = 0;
+            signals_out.imm = {{(XLEN-11){signals_in.instr[31]}}, signals_in.instr[30:20]};
+            // Special shift case
+            if(signals_out.funct3 == 'b101 | signals_out.funct3 == 'b001) begin
+                signals_out.funct7 = signals_in.instr[31:25];
+                signals_out.imm = {{(XLEN-5){1'b0}}, signals_in.instr[24:20]};
+            end
+        end
+        OP_32: begin
+            signals_out.word = 1;
         end
         default: begin
             $warning("Unsupported opcode %h", opcode);

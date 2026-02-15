@@ -16,18 +16,18 @@ extern "C"
     void vcore_set_instr_ack(Vcore *dut, uint8_t val) { dut->instr_ack = val; }
     void vcore_set_instr_data(Vcore *dut, uint32_t val) { dut->instr_data = val; }
     void vcore_set_data_ack(Vcore *dut, uint8_t val) { dut->data_ack = val; }
-    void vcore_set_data_r(Vcore *dut, uint32_t val) { dut->data_r = val; }
+    void vcore_set_data_r(Vcore *dut, uint64_t val) { dut->data_r = val; }
 
     // Bus Output Getters
     uint8_t  vcore_get_instr_re(Vcore *dut) { return dut->instr_re; }
-    uint32_t vcore_get_instr_addr(Vcore *dut) { return dut->instr_addr; }
+    uint64_t vcore_get_instr_addr(Vcore *dut) { return dut->instr_addr; }
     uint8_t  vcore_get_instr_sel(Vcore *dut) { return dut->instr_sel; }
     
     uint8_t  vcore_get_data_re(Vcore *dut) { return dut->data_re; }
-    uint32_t vcore_get_data_addr(Vcore *dut) { return dut->data_addr; }
+    uint64_t vcore_get_data_addr(Vcore *dut) { return dut->data_addr; }
     uint8_t  vcore_get_data_sel(Vcore *dut) { return dut->data_sel; }
     uint8_t  vcore_get_data_we(Vcore *dut) { return dut->data_we; }
-    uint32_t vcore_get_data_w(Vcore *dut) { return dut->data_w; }
+    uint64_t vcore_get_data_w(Vcore *dut) { return dut->data_w; }
 
     // Tracing boilerplate
     VerilatedVcdC *vcore_trace_init(Vcore *dut, const char *filename) {

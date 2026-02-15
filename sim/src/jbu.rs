@@ -13,8 +13,8 @@ impl Jbu {
     pub fn set_jump(&mut self, val: u8) { unsafe { vjbu_set_jump(self.ptr, val); } }
     pub fn set_branch(&mut self, val: u8) { unsafe { vjbu_set_branch(self.ptr, val); } }
     pub fn set_funct3(&mut self, val: u8) { unsafe { vjbu_set_funct3(self.ptr, val); } }
-    pub fn set_rs1_data(&mut self, val: u32) { unsafe { vjbu_set_rs1_data(self.ptr, val); } }
-    pub fn set_rs2_data(&mut self, val: u32) { unsafe { vjbu_set_rs2_data(self.ptr, val); } }
+    pub fn set_rs1_data(&mut self, val: u64) { unsafe { vjbu_set_rs1_data(self.ptr, val); } }
+    pub fn set_rs2_data(&mut self, val: u64) { unsafe { vjbu_set_rs2_data(self.ptr, val); } }
 
     pub fn get_je(&self) -> u8 { unsafe { vjbu_get_je(self.ptr) } }
 }
@@ -59,8 +59,8 @@ mod tests {
             jbu.set_branch(branch as u8);
             jbu.set_jump(jump as u8);
             jbu.set_funct3(funct3);
-            jbu.set_rs1_data(op1 as u32);
-            jbu.set_rs2_data(op2 as u32);
+            jbu.set_rs1_data(op1 as u64);
+            jbu.set_rs2_data(op2 as u64);
             jbu.eval();
             match (jump, branch, funct3) {
                 (true, true, _) => (),
@@ -69,8 +69,8 @@ mod tests {
                 (false, true, BNE) => prop_assert_eq!(jbu.get_je() , if op1!=op2 {1} else {0}),
                 (false, true, BLT) => prop_assert_eq!(jbu.get_je() , if op1<op2 {1} else {0}),
                 (false, true, BGE) => prop_assert_eq!(jbu.get_je() , if op1>=op2 {1} else {0}),
-                (false, true, BLTU) => prop_assert_eq!(jbu.get_je() , if (op1 as u32)<(op2 as u32) {1} else {0}),
-                (false, true, BGEU) => prop_assert_eq!(jbu.get_je() , if (op1 as u32)>=(op2 as u32) {1} else {0}),
+                (false, true, BLTU) => prop_assert_eq!(jbu.get_je() , if (op1 as u64)<(op2 as u64) {1} else {0}),
+                (false, true, BGEU) => prop_assert_eq!(jbu.get_je() , if (op1 as u64)>=(op2 as u64) {1} else {0}),
                 (false, true, _) => (),
                 (false, false, _) => prop_assert_eq!(jbu.get_je(), 0),
             }
