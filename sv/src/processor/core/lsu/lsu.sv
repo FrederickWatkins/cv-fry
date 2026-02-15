@@ -21,6 +21,8 @@ module lsu (
 
     assign data_bus.addr = signals_in.mm_addr;
     assign data_bus.data_w = signals_in.data;
+    assign data_bus.amo_op = signals_in.funct5;
+    assign data_bus.atomic = signals_in.atomic;
 
     assign signals_out.rd_addr = signals_in.rd_addr;
     
@@ -57,7 +59,6 @@ module lsu (
                 default: signals_out.data = 'x;
             endcase
             data_bus.re = 1;
-            data_bus.we = 0;
             if(data_bus.ack) begin
                 busy = 0;
                 data_bus.re = 0;
@@ -65,7 +66,6 @@ module lsu (
         end
         if(signals_in.mm_we) begin
             busy = 1;
-            data_bus.re = 0;
             data_bus.we = 1;
             if(data_bus.ack) begin
                 busy = 0;

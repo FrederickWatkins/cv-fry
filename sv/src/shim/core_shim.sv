@@ -15,6 +15,8 @@ module core_shim (
     input  logic [XLEN-1:0]  data_r,
     output logic             data_re,
     output logic             data_we,
+    output logic atomic,
+    output logic [4:0] amo_op,
     output logic [XLEN/8-1:0] data_sel,
     output logic [XLEN-1:0]  data_addr,
     output logic [XLEN-1:0]  data_w
@@ -38,6 +40,8 @@ module core_shim (
         instr_addr <= instr_bus.addr;
         data_re <= data_bus.re;
         data_we <= data_bus.we;
+        atomic <= data_bus.atomic;
+        amo_op <= data_bus.amo_op;
         data_sel <= data_bus.sel;
         data_addr <= data_bus.addr;
         data_w <= data_bus.data_w;

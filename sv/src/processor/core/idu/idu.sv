@@ -14,6 +14,7 @@ module idu (
         BRANCH = 'b11000,
         JALR = 'b11001,
         MISC_MEM = 'b00011,
+        AMO = 'b01011,
         JAL = 'b11011,
         OP_IMM = 'b00100,
         OP = 'b01100,
@@ -41,8 +42,10 @@ module idu (
         signals_out.op2_imm = 0;
         signals_out.mm_re = 0;
         signals_out.mm_we = 0;
+        signals_out.atomic = 0;
         signals_out.alu_funct3 = signals_in.instr[14:12];
         signals_out.funct3 = signals_in.instr[14:12];
+        signals_out.funct5 = signals_in.instr[31:27];
         signals_out.funct7 = signals_in.instr[31:25];
         signals_out.imm = 0;
         signals_out.rd_addr = signals_in.instr[11:7];
@@ -85,6 +88,18 @@ module idu (
             signals_out.rs1_addr = 0;
             signals_out.rs2_addr = 0;
             signals_out.rd_addr = 0;
+        end
+        AMO: begin
+            signals_out.atomic = 1;
+            signals_out.op2_imm = 1; // Add zero to address
+            signals_out.mm_re = 1;
+            signals_out.mm_we = 1;
+            signals_out.alu_funct3 = 'b000; // Use ALU to add zero to address
+            signals_out.funct7 = 0;
+            if(signals_out.funct5 == 'b00010) begin // LR doesn't write any data
+                signals_out.rs2_addr = 0;
+                signals_out.mm_we = 0;
+            end 
         end
         JAL: begin
             signals_out.rs1_addr = 0;

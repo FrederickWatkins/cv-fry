@@ -124,7 +124,7 @@ module core (
     // Decode-exectue pipeline register
     pipeline_reg #(
         .T(execute_signals),
-        .NOP(execute_signals'{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        .NOP(execute_signals'{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
     ) pipeline_E (
         .clk,
         .reset_n,
@@ -137,7 +137,7 @@ module core (
     // Execute-memory pipeline register
     pipeline_reg #(
         .T(memory_signals),
-        .NOP(memory_signals'{0, 0, 0, 0, 0, 0})
+        .NOP(memory_signals'{0, 0, 0, 0, 0, 0, 0, 0})
     ) pipeline_M (
         .clk,
         .reset_n,

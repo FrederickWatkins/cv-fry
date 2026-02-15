@@ -25,6 +25,8 @@ impl Core {
     pub fn get_data_re(&self) -> u8 { unsafe { vcore_get_data_re(self.ptr) } }
     pub fn get_data_addr(&self) -> u64 { unsafe { vcore_get_data_addr(self.ptr) } }
     pub fn get_data_sel(&self) -> u8 { unsafe { vcore_get_data_sel(self.ptr) } }
+    pub fn get_atomic(&self) -> u8 { unsafe {vcore_get_atomic(self.ptr)}}
+    pub fn get_amo_op(&self) -> u8 { unsafe {vcore_get_amo_op(self.ptr)}}
     pub fn get_data_we(&self) -> u8 { unsafe { vcore_get_data_we(self.ptr) } }
     pub fn get_data_w(&self) -> u64 { unsafe { vcore_get_data_w(self.ptr) } }
     
@@ -219,6 +221,8 @@ mod tests {
                 &mut memory, 
                 core.get_data_we() == 1, 
                 core.get_data_re() == 1, 
+                core.get_atomic() == 1,
+                core.get_amo_op(),
                 core.get_data_sel(), 
                 core.get_data_addr(), 
                 core.get_data_w()

@@ -26,6 +26,8 @@ module ieu (
     assign signals_out.funct3 = signals_in.funct3;
     assign signals_out.mm_re = signals_in.mm_re;
     assign signals_out.mm_we = signals_in.mm_we;
+    assign signals_out.atomic = signals_in.atomic;
+    assign signals_out.funct5 = signals_in.funct5;
     assign signals_out.mm_addr = alu_result;
     assign signals_out.rd_addr = signals_in.rd_addr;
     assign ja = alu_result;

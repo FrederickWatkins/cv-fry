@@ -27,6 +27,8 @@ extern "C"
     uint64_t vcore_get_data_addr(Vcore *dut) { return dut->data_addr; }
     uint8_t  vcore_get_data_sel(Vcore *dut) { return dut->data_sel; }
     uint8_t  vcore_get_data_we(Vcore *dut) { return dut->data_we; }
+    uint8_t vcore_get_atomic(Vcore *dut) { return dut->atomic; }
+    uint8_t vcore_get_amo_op(Vcore *dut) { return dut->amo_op; }
     uint64_t vcore_get_data_w(Vcore *dut) { return dut->data_w; }
 
     // Tracing boilerplate

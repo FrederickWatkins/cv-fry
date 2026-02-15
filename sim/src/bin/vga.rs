@@ -84,6 +84,8 @@ impl EmulatorState {
                 &mut self.memory,
                 self.core.get_data_we() == 1,
                 self.core.get_data_re() == 1,
+                self.core.get_atomic() == 1,
+                self.core.get_amo_op(),
                 self.core.get_data_sel(),
                 self.core.get_data_addr(),
                 self.core.get_data_w(),
