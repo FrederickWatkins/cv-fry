@@ -10,8 +10,8 @@
 - Pull registers out of modules and into generic pipeline regs ☑️ Done!
 - Add operand forwarding ☑️ Done! 832 cycles to 551 to execute stress test!!
 - Add muldiv instructions ☑️ Done!
-- Add C instructions
-- Add A (god save us)
+- Add C instructions ☑️ Done!
+- Add A (god save us) ☑️ Done! (cheated, just offloaded all of it to a cache that doesn't yet exist)
 - Port to 64 bit ☑️ Done!
 - Add Zcsr (and Zfencei, but it's nop for now)
 - Add interrupts (big one) and wire up invalid instructions to exceptions instead of doing nothing

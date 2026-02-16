@@ -29,7 +29,7 @@ fn main() {
             let clang_status = Command::new("clang")
                 .args(&[
                     "--target=riscv64",
-                    "-march=rv64im",
+                    "-march=rv64imac",
                     "-mabi=lp64",
                     "-ffreestanding",
                     "-nostdlib",
